@@ -246,7 +246,7 @@ export default function Aboutpage() {
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-auto md:h-[400px] lg:h-[500px]">
                 {/* Card 1 */}
-                <div className="bg-[#2A2E34] rounded-[24px] p-8 md:p-10 flex flex-col justify-center text-[#FFFFFF] relative">
+                <div className="bg-[#2A2E34] rounded-[8px] p-8 md:p-10 flex flex-col justify-center text-[#FFFFFF] relative">
                   <p className="text-[14px] md:text-[15px] lg:text-[18px] font-['DM_Sans'] leading-relaxed md:leading-[1.4] lg:leading-relaxed mb-10">
                     "Our team is led by experienced engineers with strong
                     technical background, ensuring that every project is
