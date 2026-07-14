@@ -77,3 +77,34 @@
     transform: translateY(0px);
   }
 }
+@keyframes statGradient {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+.navbar-align-outer {
+  width: 100%;
+}
+
+.navbar-align-inner {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding-left: 24px;
+  padding-right: 24px;
+}
+
+@media (max-width: 768px) {
+  .navbar-align-inner {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}

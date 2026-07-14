@@ -1,48 +1,55 @@
 import React, { useState, useEffect, useRef } from "react";
-import capimg1 from "../../assets/capimg1.png";
-import capimg2 from "../../assets/capimg2.png";
-import capimg3 from "../../assets/capimg3.png";
-import capimg4 from "../../assets/capimg4.png"; 
+import img from "../../assets/capimg1.png";
 import {
-  Pyramid,
-  Zap,
-  Code,
-  Cpu,
-} from "lucide-react";
-import { ExpandingCards } from "@/components/ui/expanding-cards";
-const capabilitiesData = [
+  motion,
+  useMotionValue,
+  useMotionTemplate,
+  useAnimationFrame
+} from "framer-motion";
+
+const competencies = [
   {
-    id: "mechanical-design",
-    title: "Mechanical Design",
-    description: "Structural engineering, 3D modelling, tolerance analysis and prototyping.",
-    imgSrc: capimg1,
-    linkHref: "#",
+    title: "Experienced & Skilled Engineering Team",
+    description:
+      "Led by engineers with strong technical backgrounds — dedicated and committed to delivering reliable manufacturing solutions.",
   },
   {
-    id: "electrical-design",
-    title: "Electrical Design",
-    description: "PCB layout, power systems, wiring design and electrical safety compliance.",
-    imgSrc: capimg2,  
-    linkHref: "#",
-  },
-  {
-    id: "software-design",
-    title: "Software and Firmware Design",
-    description: "Embedded systems, IoT connectivity, control logic and HMI development.",
-    imgSrc: capimg3,  
-    linkHref: "#",
-  },
-  {
-    id: "automation-design",
-    title: "Automation Design and Integration",
-    description: "PLC programming, robotic systems, sensor arrays and machine vision.",
-    imgSrc: capimg4,   
-    linkHref: "#",
+    title: "Flexible & Scalable Solutions",
+    description:
+      "Manufacturing that flexes from prototype runs to full production volume — scaling cleanly as your demand grows.",
   },
 ];
+
 export default function Capabilities() {
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef(null);
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
+  const handleMouseMove = (e) => {
+    const { clientX, clientY, currentTarget } = e;
+    const { left, top } = currentTarget.getBoundingClientRect();
+
+    mouseX.set(clientX - left);
+    mouseY.set(clientY - top);
+  };
+
+  const gridOffsetX = useMotionValue(0);
+  const gridOffsetY = useMotionValue(0);
+
+  const speedX = 0.4;
+  const speedY = 0.4;
+
+  useAnimationFrame(() => {
+    const currentX = gridOffsetX.get();
+    const currentY = gridOffsetY.get();
+
+    gridOffsetX.set((currentX + speedX) % 40);
+    gridOffsetY.set((currentY + speedY) % 40);
+  });
+
+  const maskImage = useMotionTemplate`radial-gradient(150px circle at ${mouseX}px ${mouseY}px, black, transparent)`;
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -53,62 +60,147 @@ export default function Capabilities() {
       },
       { threshold: 0.1 }
     );
+
     if (sectionRef.current) {
       observer.observe(sectionRef.current);
     }
+
     return () => observer.disconnect();
   }, []);
+
   return (
     <section
       id="capabilities"
       ref={sectionRef}
-      className="py-12 lg:py-20 bg-[#EEF6FD] text-[#2A2E34] overflow-hidden"
+      onMouseMove={handleMouseMove}
+      className="py-12 lg:py-24 bg-[#FFFFFF] text-[#2A2E34] overflow-hidden relative"
     >
-      <div className="responsive-container">
-        
-        {/* Section Header (2-Column Layout on Desktop) */}
-        <div
-          className={`flex flex-col lg:flex-row justify-between items-start gap-5 sm:gap-6 lg:gap-12 mb-12 sm:mb-16 transition-all duration-700 ease-out transform ${
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-          }`}
-        >
-          <div className="w-full lg:flex-1">
-            <h2 className="font-['Space_Grotesk'] font-bold text-[25px] sm:text-[36px] lg:text-[40px] leading-[35px] sm:leading-[48px] lg:leading-[55px] text-[#2A2E34]">
-              Integrated Capabilities
-              <br />
-              <span className="bg-gradient-to-r from-[#0EA5E9] to-[#818CF8] bg-clip-text text-transparent">
-                Exceptional Outcomes
-              </span>
-            </h2>
-          </div>
-          <div className="w-full lg:flex-1 lg:mt-1">
-            <p className="font-['DM_Sans'] text-[14px] sm:text-[15px] lg:text-[16px] font-normal leading-[25px] sm:leading-[27.2px] text-[#64748B]">
-              NLP Technology provides end-to-end engineering, manufacturing, automation, and lifecycle support solutions—from product design and development to production, fulfillment, and continuous operational improvement.
-            </p>
-          </div>
+      {/* Base Grid Background */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+        <div className="absolute inset-0 opacity-100">
+          <GridPattern
+            offsetX={gridOffsetX}
+            offsetY={gridOffsetY}
+            active={false}
+          />
         </div>
-        {/* Accordion Layout: Horizontal on Desktop, Vertical on Mobile */}
-        <div
-          className={`transition-all duration-700 ease-out delay-200 transform ${
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"
-          }`}
+
+        {/* Hover Active Grid Layer */}
+        <motion.div
+          className="absolute inset-0 opacity-100"
+          style={{ maskImage, WebkitMaskImage: maskImage }}
         >
-          <ExpandingCards items={capabilitiesData} defaultActiveIndex={null} />
-        </div>
-        {/* Explore More Button */}
-        <div
-          className={`flex justify-center mt-10 sm:mt-12 transition-all duration-700 ease-out delay-700 transform ${
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-          }`}
-        >
-          <a
-            href="#capabilities"
-            className="flex items-center justify-center px-6 lg:px-8 h-[44px] lg:h-[50px] rounded-[15px] bg-[#2A2E34] font-['DM_Sans'] text-[14px] sm:text-[15px] lg:text-[16px] font-normal text-white hover:bg-[#0EA5E9] hover:scale-[1.04] transition-all duration-300 ease-out active:scale-95 shadow-md"
-          >
-            Explore More
-          </a>
+          <GridPattern
+            offsetX={gridOffsetX}
+            offsetY={gridOffsetY}
+            active={true}
+          />
+        </motion.div>
+      </div>
+
+      <div className="navbar-align-outer relative z-10">
+        <div className="navbar-align-inner">
+          <div className="grid grid-cols-1 lg:grid-cols-[560px_1fr] gap-12 lg:gap-[120px] items-center w-full">
+            {/* Left Column: Image */}
+            <motion.div
+              className="w-full flex justify-center order-2 lg:order-1"
+              initial={{ opacity: 0, x: -40 }}
+              animate={isVisible ? { opacity: 1, x: 0 } : {}}
+              transition={{ duration: 0.7, ease: "easeOut", delay: 0.1 }}
+            >
+              <div className="w-[430px] lg:w-full max-w-[520px] aspect-[4/5] rounded-[20px] overflow-hidden shadow-lg group">
+                <img
+                  src={img}
+                  alt="Core Competencies"
+                  className="w-full h-full object-cover transition-transform duration-300 ease-out group-hover:scale-105"
+                />
+              </div>
+            </motion.div>
+
+            {/* Right Column: Content */}
+            <motion.div
+              className="w-full flex flex-col items-center lg:items-start order-1 lg:order-2"
+              initial={{ opacity: 0, x: 40 }}
+              animate={isVisible ? { opacity: 1, x: 0 } : {}}
+              transition={{ duration: 0.7, ease: "easeOut", delay: 0.3 }}
+            >
+              {/* Header */}
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-[30px] h-[1px] bg-[#00B2F9]"></div>
+
+                <span className="font-['Inter'] lg:items-start font-semibold text-[12px] md:text-[14px] lg:text-[16px] leading-[20px] tracking-[1.8px] uppercase text-[#00B2F9]">
+                  Core Competencies
+                </span>
+              </div>
+
+              <h2 className="font-['Space_Grotesk'] font-bold text-[25px] md:text-[32px] lg:text-[40px] leading-[1.2] lg:leading-[60px] tracking-[-0.96px] text-[#2A2E34] mb-12 max-w-[570px]">
+                Capability you can build a roadmap on
+              </h2>
+
+            <div className="flex flex-col gap-8 w-full max-w-[700px]">
+                {competencies.map((item, index) => (
+                  <div
+                    key={index}
+                    className="p-6 min-h-[150px] flex flex-col justify-center rounded-[8px] border-l-[4px] border-[#0EA5E9] bg-[#F5F5F5] transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-lg hover:shadow-sky-100 hover:bg-white hover:border-[#0284C7] cursor-pointer"
+                  >
+                    <h3 className="font-['Space_Grotesk'] font-medium text-[17px] md:text-[19px] lg:text-[20px] leading-[28px] tracking-[-0.36px] text-[#2A2E34] mb-4">
+                      {item.title}
+                    </h3>
+
+                    <p className="font-['Dm_Sans'] font-normal text-[15px] md:text-[17px] lg:text-[18px] leading-[22px] text-[#2A2E34] max-w-[557px]">
+                      {item.description}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          </div>
         </div>
       </div>
     </section>
   );
 }
+
+const GridPattern = ({ offsetX, offsetY, active }) => {
+  return (
+    <svg className="w-full h-full">
+      <defs>
+        <motion.pattern
+          id={
+            active
+              ? "grid-pattern-active-capabilities"
+              : "grid-pattern-base-capabilities"
+          }
+          width="40"
+          height="40"
+          patternUnits="userSpaceOnUse"
+          x={offsetX}
+          y={offsetY}
+        >
+          <path
+            d="M 40 0 L 0 0 0 40"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.3"
+            className={
+              active
+                ? "text-[#0EA5E9]/[0.25]"
+                : "text-[#2A2E34]/[0.05]"
+            }
+          />
+        </motion.pattern>
+      </defs>
+
+      <rect
+        width="100%"
+        height="100%"
+        fill={
+          active
+            ? "url(#grid-pattern-active-capabilities)"
+            : "url(#grid-pattern-base-capabilities)"
+        }
+      />
+    </svg>
+  );
+};
+
