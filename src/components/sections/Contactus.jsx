@@ -272,7 +272,7 @@ const ContactSection = () => {
       <section
         id="contact"
         ref={sectionRef}
-        className="relative py-16 lg:py-24 bg-cover bg-center"
+        className="relative py-[40px] lg:py-[60px] bg-cover bg-center"
         style={{ backgroundImage: `url(${bgImage})` }}
       >
         {/* Overlay */}

@@ -73,7 +73,7 @@ export default function Capabilities() {
       id="capabilities"
       ref={sectionRef}
       onMouseMove={handleMouseMove}
-      className="py-12 lg:py-24 bg-[#FFFFFF] text-[#2A2E34] overflow-hidden relative"
+      className="py-[40px] md:py-[50px] lg:pt-[50px] lg:pb-[60px] bg-[#FFFFFF] text-[#2A2E34] overflow-hidden relative"
     >
       {/* Base Grid Background */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
@@ -100,7 +100,7 @@ export default function Capabilities() {
 
       <div className="navbar-align-outer relative z-10">
         <div className="navbar-align-inner">
-          <div className="grid grid-cols-1 lg:grid-cols-[560px_1fr] gap-12 lg:gap-[120px] items-center w-full">
+          <div className="grid grid-cols-1 lg:grid-cols-[560px_1fr] gap-12 lg:gap-[110px] items-center w-full">
             {/* Left Column: Image */}
             <motion.div
               className="w-full flex justify-center order-2 lg:order-1"
@@ -119,7 +119,7 @@ export default function Capabilities() {
 
             {/* Right Column: Content */}
             <motion.div
-              className="w-full flex flex-col items-center lg:items-start order-1 lg:order-2"
+              className="w-full flex flex-col items-start order-1 lg:order-2"
               initial={{ opacity: 0, x: 40 }}
               animate={isVisible ? { opacity: 1, x: 0 } : {}}
               transition={{ duration: 0.7, ease: "easeOut", delay: 0.3 }}

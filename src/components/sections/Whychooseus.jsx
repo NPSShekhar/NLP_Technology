@@ -104,7 +104,7 @@ export default function Whychooseus() {
       id="whychooseus"
       ref={sectionRef}
       onMouseMove={handleMouseMove}
-      className="py-12 md:py-18 :pt-6 pb-20 md:pt-6 md:pb-20 lg:pt-5 lg:pb-20 bg-[#FFFFFF] overflow-hidden relative"
+      className="py-[40px] md:py-18  lg:pt-[50px] lg:pb-[50px] bg-[#FFFFFF] overflow-hidden relative"
     >
       {/* Base Grid Background */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">

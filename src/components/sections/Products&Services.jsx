@@ -46,7 +46,7 @@ export default function ProductsAndServices() {
     <section
       id="services"
       ref={sectionRef}
-      className="py-16 lg:py-24 bg-[#EEF6FD] text-[#2A2E34] overflow-hidden"
+      className="py-[40px] lg:py-[60px] bg-[#EEF6FD] text-[#2A2E34] overflow-hidden"
     >
       <div className="responsive-container">
         {/* Header */}

@@ -15,6 +15,7 @@ export default function Aboutus() {
 
   const sectionRef = useRef(null);
   const isInView = useInView(sectionRef, { once: true, amount: 0.15 });
+
   const handleMouseMove = (e) => {
     const { clientX, clientY, currentTarget } = e;
     const { left, top } = currentTarget.getBoundingClientRect();
@@ -44,7 +45,7 @@ export default function Aboutus() {
       id="about"
       ref={sectionRef}
       onMouseMove={handleMouseMove}
-      className="relative pt-[80px] pb-20 md:pt-[95px] md:pb-[85px] lg:pt-[100px] lg:pb-26 bg-[#FFFFFF] overflow-hidden text-[#2A2E34] flex flex-col items-center justify-center min-h-[600px]"
+      className="relative py-[40px] md:py-[50px] lg:pt-[80px] lg:pb-[50px] bg-[#FFFFFF] overflow-hidden text-[#2A2E34] flex flex-col items-center justify-center"
     >
       {/* Base Grid Background */}
       <div className="absolute inset-0 z-0 opacity-100 pointer-events-none">
