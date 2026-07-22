@@ -1,11 +1,15 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Navbar from "../components/Layout/navbar";
 import Footer from "../components/Layout/Footer";
 import { FiMail, FiMapPin } from "react-icons/fi";
 import heroBg from "../assets/contact_herobg.png";
 import contactMap from "../assets/contact-map.png";
-import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
+import { useContactEnquiryForm } from "../lib/contactForm";
+import {
+  ContactPhoneField,
+  ContactPrivacyCheckbox,
+} from "../components/ContactFormFields";
 import {
   motion,
   useMotionValue,
@@ -45,6 +49,20 @@ const SendArrowIcon = ({ className = "w-4 h-4" }) => (
 export default function Contactpage() {
   const location = useLocation();
 
+  const {
+    form,
+    errors,
+    submitted,
+    submitting,
+    submitError,
+    setSubmitted,
+    handleChange,
+    handlePhoneCountryChange,
+    handlePhoneChange,
+    handlePrivacyChange,
+    handleSubmit,
+  } = useContactEnquiryForm();
+
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
 
@@ -75,7 +93,9 @@ export default function Contactpage() {
   useEffect(() => {
     if (location.state?.scrollTo === "contact-form-section") {
       const timer = setTimeout(() => {
-        const section = document.getElementById("contact-form-section");
+        const section = document.getElementById(
+          "contact-form-section"
+        );
 
         if (section) {
           section.scrollIntoView({
@@ -110,27 +130,30 @@ export default function Contactpage() {
       <main className="flex-grow pt-[60px] sm:pt-[68px] lg:pt-[75px]">
         {/* Hero Section */}
         <section className="relative h-[250px] md:h-[350px] lg:h-[400px] flex items-center justify-center overflow-hidden">
-         <div className="absolute inset-0 z-0">
-  <div className="absolute inset-0 z-10 mix-blend-multiply bg-[linear-gradient(90deg,rgba(26,32,41,0.85)_0%,rgba(26,32,41,0.65)_50%,rgba(26,32,41,0.35)_100%)]"></div>
+          <div className="absolute inset-0 z-0">
+            <div className="absolute inset-0 z-10 mix-blend-multiply bg-[linear-gradient(90deg,rgba(26,32,41,0.85)_0%,rgba(26,32,41,0.65)_50%,rgba(26,32,41,0.35)_100%)]"></div>
 
-  <img
-    src={heroBg}
-    alt="Contact Hero"
-    className="w-full h-full object-cover"
-  />
-</div>
+            <img
+              src={heroBg}
+              alt="Contact Hero"
+              className="w-full h-full object-cover"
+            />
+          </div>
 
           <motion.div
             initial={{ opacity: 0, scale: 0.85 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            transition={{
+              duration: 0.6,
+              ease: [0.22, 1, 0.36, 1],
+            }}
             className="relative z-20 text-center text-[#FFFFFF] mt-8"
           >
             <h1 className="font-['Space_Grotesk'] font-medium text-[32px] md:text-[42px] lg:text-[48px] leading-tight mb-2">
               Contact us
             </h1>
 
-            <p className="text-[15px] md:text-[16px] lg:text-[18px] font-['DM_Sans'] font-normal text-[#FFFFFF] ">
+            <p className="text-[15px] md:text-[16px] lg:text-[18px] font-['DM_Sans'] font-normal text-[#FFFFFF]">
               <span
                 onClick={() => (window.location.href = "/")}
                 className="cursor-pointer hover:underline"
@@ -158,7 +181,10 @@ export default function Contactpage() {
 
             <motion.div
               className="absolute inset-0 opacity-100"
-              style={{ maskImage, WebkitMaskImage: maskImage }}
+              style={{
+                maskImage,
+                WebkitMaskImage: maskImage,
+              }}
             >
               <ContactGridPattern
                 offsetX={gridOffsetX}
@@ -175,7 +201,10 @@ export default function Contactpage() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, ease: "easeOut" }}
+              transition={{
+                duration: 0.7,
+                ease: "easeOut",
+              }}
               className="text-center mb-16 md:mb-20 lg:mb-24"
             >
               <h2 className="font-['Space_Grotesk'] font-bold text-[25px] md:text-[33px] lg:text-[40px] text-[#2A2E34] mb-4">
@@ -205,7 +234,10 @@ export default function Contactpage() {
               {/* Left Info Panel */}
               <motion.div
                 variants={{
-                  hidden: { opacity: 0, x: -30 },
+                  hidden: {
+                    opacity: 0,
+                    x: -30,
+                  },
                   show: {
                     opacity: 1,
                     x: 0,
@@ -291,7 +323,13 @@ export default function Contactpage() {
                           d="M12 2C8.14 2 5 5.14 5 9C5 14.25 12 22 12 22C12 22 19 14.25 19 9C19 5.14 15.86 2 12 2Z"
                           fill="#FF0000"
                         />
-                        <circle cx="12" cy="9" r="3" fill="#FFFFFF" />
+
+                        <circle
+                          cx="12"
+                          cy="9"
+                          r="3"
+                          fill="#FFFFFF"
+                        />
                       </svg>
 
                       <span className="text-[#2A2E34] font-['DM_Sans'] font-semibold text-[10px] md:text-[13px] lg:text-[13px]">
@@ -312,6 +350,7 @@ export default function Contactpage() {
                           strokeLinecap="round"
                           strokeLinejoin="round"
                         />
+
                         <polyline
                           points="15 3 21 3 21 9"
                           stroke="#2A2E34"
@@ -319,6 +358,7 @@ export default function Contactpage() {
                           strokeLinecap="round"
                           strokeLinejoin="round"
                         />
+
                         <line
                           x1="10"
                           y1="14"
@@ -338,7 +378,10 @@ export default function Contactpage() {
               {/* Right Form Panel */}
               <motion.div
                 variants={{
-                  hidden: { opacity: 0, x: 30 },
+                  hidden: {
+                    opacity: 0,
+                    x: 30,
+                  },
                   show: {
                     opacity: 1,
                     x: 0,
@@ -348,81 +391,239 @@ export default function Contactpage() {
                     },
                   },
                 }}
-                className="w-full lg:w-[50%] h-full p-0 flex flex-col justify-center"
+                className="w-full lg:w-[50%] h-full flex flex-col justify-center"
               >
-                <form className="flex flex-col gap-9">
-                  <div className="flex flex-col lg:flex-row gap-5">
-                    <div className="flex flex-col gap-2 w-full">
-                      <label className="text-[17px] md:text-[18px] lg:text-[19px] font-['DM_Sans'] font-medium text-[#2A2E34]">
-                        Name
-                      </label>
+                {submitted ? (
+                  <div className="w-full min-h-[579px] bg-[#FFFFFF] rounded-[10px] px-7 py-7 pt-[70px] shadow-xl text-[#0B1C30] relative overflow-hidden">
+                    <div className="min-h-[380px] text-center flex flex-col items-center justify-center">
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.85 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.5, ease: "easeOut" }}
+                        className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center text-green-500 mb-6"
+                      >
+                        <svg
+                          className="w-8 h-8"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          strokeWidth="3"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M5 13l4 4L19 7"
+                          />
+                        </svg>
+                      </motion.div>
 
-                      <input
-                        type="text"
-                        placeholder="Your name"
-                        className="px-4 py-3 font-['DM_Sans'] rounded-[8px] border border-gray-200 bg-[#FFFFFF] text-[14px] md:text-[15px] lg:text-[16px] outline-none focus:border-[#00B2F9] transition-colors"
-                      />
-                    </div>
+                      <motion.h3
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5, delay: 0.2 }}
+                        className="font-['Space_Grotesk'] font-bold text-[24px] md:text-[26px] lg:text-[27px] text-[#1E293B]"
+                      >
+                        Request Sent!
+                      </motion.h3>
 
-                    <div className="flex flex-col gap-2 w-full">
-                      <label className="text-[17px] md:text-[18px] lg:text-[19px] font-['DM_Sans'] font-medium text-[#2A2E34]">
-                        Phone
-                      </label>
+                      <motion.p
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5, delay: 0.2 }}
+                        className="mt-4 font-['DM_Sans'] text-[14px] md:text-[15px] lg:text-[17px] text-[#64748B] max-w-[320px]"
+                      >
+                        Thank you for reaching out. Our team will
+                        review your details and contact you within one business
+                        day.
+                      </motion.p>
 
-                      <input
-                        type="text"
-                        placeholder="Your phone number"
-                        className="px-4 py-3 font-['DM_Sans'] rounded-[8px] border border-gray-200 bg-[#FFFFFF] text-[14px] md:text-[15px] lg:text-[16px] outline-none focus:border-[#00B2F9] transition-colors"
-                      />
+                      <motion.button
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5, delay: 0.35 }}
+                        type="button"
+                        onClick={() => setSubmitted(false)}
+                        className="mt-8 px-6 py-2 border border-[#0EA5E9] text-[#0EA5E9] rounded-md text-[14px] md:text-[15px] lg:text-[16px] font-medium hover:bg-[#0EA5E9] hover:text-white hover:scale-[1.03] transition-all duration-200 font-['DM_Sans']"
+                      >
+                        Submit Another Request
+                      </motion.button>
                     </div>
                   </div>
+                ) : (
+                <form
+                  onSubmit={handleSubmit}
+                  className="flex flex-col gap-5 w-full"
+                  noValidate
+                >
+                  {/* Name and Email */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                    <div className="flex flex-col gap-2">
+                      <label
+                        htmlFor="contact-page-name"
+                        className="text-[17px] md:text-[18px] lg:text-[19px] font-['DM_Sans'] font-medium text-[#2A2E34]"
+                      >
+                        Name{" "}
+                        <span className="text-red-500">*</span>
+                      </label>
 
-                  <div className="flex flex-col lg:flex-row gap-5">
-                    <div className="flex flex-col gap-2 w-full">
-                      <label className="text-[17px] md:text-[18px] lg:text-[19px] font-['DM_Sans'] font-medium text-[#2A2E34]">
-                        Email
+                      <input
+                        type="text"
+                        id="contact-page-name"
+                        name="name"
+                        value={form.name}
+                        onChange={handleChange}
+                        placeholder="Your name"
+                        autoComplete="name"
+                        className={`h-[44px] px-4 font-['DM_Sans'] rounded-[8px] border bg-[#FFFFFF] text-[14px] md:text-[15px] lg:text-[16px] outline-none transition-colors ${
+                          errors.name
+                            ? "border-red-500"
+                            : "border-gray-200 focus:border-[#00B2F9]"
+                        }`}
+                      />
+
+                      {errors.name && (
+                        <span className="text-red-500 text-[11px] font-['DM_Sans']">
+                          {errors.name}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                      <label
+                        htmlFor="contact-page-email"
+                        className="text-[17px] md:text-[18px] lg:text-[19px] font-['DM_Sans'] font-medium text-[#2A2E34]"
+                      >
+                        Email{" "}
+                        <span className="text-red-500">*</span>
                       </label>
 
                       <input
                         type="email"
+                        id="contact-page-email"
+                        name="email"
+                        value={form.email}
+                        onChange={handleChange}
                         placeholder="Your email address"
-                        className="px-4 py-3 font-['DM_Sans'] rounded-[8px] border border-gray-200 bg-[#FFFFFF] text-[14px] md:text-[15px] lg:text-[16px] outline-none focus:border-[#00B2F9] transition-colors"
+                        autoComplete="email"
+                        className={`h-[44px] px-4 font-['DM_Sans'] rounded-[8px] border bg-[#FFFFFF] text-[14px] md:text-[15px] lg:text-[16px] outline-none transition-colors ${
+                          errors.email
+                            ? "border-red-500"
+                            : "border-gray-200 focus:border-[#00B2F9]"
+                        }`}
                       />
-                    </div>
 
-                    <div className="flex flex-col gap-2 w-full">
-                      <label className="text-[17px] md:text-[18px] lg:text-[19px] font-['DM_Sans'] font-medium text-[#2A2E34]">
-                        Address
+                      {errors.email && (
+                        <span className="text-red-500 text-[11px] font-['DM_Sans']">
+                          {errors.email}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Phone and Address */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                    <ContactPhoneField
+                      idPrefix="contact-page"
+                      form={form}
+                      errors={errors}
+                      onCountryChange={handlePhoneCountryChange}
+                      onPhoneChange={handlePhoneChange}
+                      selectClassName="pl-3 pr-9 rounded-[8px]"
+                      inputClassName="rounded-[8px]"
+                    />
+
+                    <div className="flex flex-col gap-2">
+                      <label
+                        htmlFor="contact-page-address"
+                        className="text-[17px] md:text-[18px] lg:text-[19px] font-['DM_Sans'] font-medium text-[#2A2E34]"
+                      >
+                        Address{" "}
+                        <span className="text-red-500">*</span>
                       </label>
 
                       <input
                         type="text"
+                        id="contact-page-address"
+                        name="address"
+                        value={form.address}
+                        onChange={handleChange}
                         placeholder="Your company address"
-                        className="px-4 py-3 font-['DM_Sans'] rounded-[8px] border border-gray-200 bg-[#FFFFFF] text-[14px] md:text-[15px] lg:text-[16px] outline-none focus:border-[#00B2F9] transition-colors"
+                        autoComplete="street-address"
+                        className={`h-[44px] px-4 font-['DM_Sans'] rounded-[8px] border bg-[#FFFFFF] text-[14px] md:text-[15px] lg:text-[16px] outline-none transition-colors ${
+                          errors.address
+                            ? "border-red-500"
+                            : "border-gray-200 focus:border-[#00B2F9]"
+                        }`}
                       />
+
+                      {errors.address && (
+                        <span className="text-red-500 text-[11px] font-['DM_Sans']">
+                          {errors.address}
+                        </span>
+                      )}
                     </div>
                   </div>
 
+                  {/* Message */}
                   <div className="flex flex-col gap-2 w-full">
-                    <label className="text-[17px] md:text-[18px] lg:text-[19px] font-['DM_Sans'] font-medium text-[#2A2E34]">
-                      Message/ Enquiry
+                    <label
+                      htmlFor="contact-page-message"
+                      className="text-[17px] md:text-[18px] lg:text-[19px] font-['DM_Sans'] font-medium text-[#2A2E34]"
+                    >
+                      Message/ Enquiry{" "}
+                      <span className="text-red-500">*</span>
                     </label>
 
                     <textarea
+                      id="contact-page-message"
+                      name="message"
+                      value={form.message}
+                      onChange={handleChange}
                       placeholder="Tell us about your requirements (up to 600 words)"
                       rows="8"
-                      className="px-4 py-3 font-['DM_Sans'] rounded-[8px] border border-gray-200 bg-[#FFFFFF] text-[14px] md:text-[15px] lg:text-[16px] outline-none focus:border-[#00B2F9] transition-colors resize-none"
-                    ></textarea>
+                      className={`px-4 py-3 font-['DM_Sans'] rounded-[8px] border bg-[#FFFFFF] text-[14px] md:text-[15px] lg:text-[16px] outline-none transition-colors resize-none ${
+                        errors.message
+                          ? "border-red-500"
+                          : "border-gray-200 focus:border-[#00B2F9]"
+                      }`}
+                    />
+
+                    {errors.message && (
+                      <span className="text-red-500 text-[11px] font-['DM_Sans']">
+                        {errors.message}
+                      </span>
+                    )}
                   </div>
+
+                  <ContactPrivacyCheckbox
+                    idPrefix="contact-page"
+                    form={form}
+                    errors={errors}
+                    onChange={handlePrivacyChange}
+                  />
+
+                  {submitError && (
+                    <p className="rounded-[8px] bg-red-50 px-4 py-3 font-['DM_Sans'] text-[14px] text-red-600">
+                      {submitError}
+                    </p>
+                  )}
+
 
                   <button
                     type="submit"
-                    className="mt-3 w-full h-[54px] bg-[#00B2F9] hover:bg-[#0EA5E9] text-[#FFFFFF] rounded-[8px] font-medium font-['DM_Sans'] text-[17px] md:text-[18px] lg:text-[19px] flex items-center justify-center gap-2 hover:scale-[1.04] transition-all duration-300 ease-out active:scale-95 shadow-md"
+                    disabled={submitting}
+                    className="mt-3 w-full h-[54px] bg-[#00B2F9] hover:bg-[#0EA5E9] text-[#FFFFFF] rounded-[8px] font-medium font-['DM_Sans'] text-[17px] md:text-[18px] lg:text-[19px] flex items-center justify-center gap-2 hover:scale-[1.04] transition-all duration-300 ease-out active:scale-95 shadow-md disabled:cursor-not-allowed disabled:opacity-60"
                   >
-                    Send enquiry
-                    <SendArrowIcon className="w-4 h-4 text-[#FFFFFF]" />
+                    {submitting
+                      ? "Sending..."
+                      : "Send enquiry"}
+
+                    {!submitting && (
+                      <SendArrowIcon className="w-4 h-4 text-[#FFFFFF]" />
+                    )}
                   </button>
                 </form>
+                )}
               </motion.div>
             </motion.div>
           </div>
@@ -434,7 +635,11 @@ export default function Contactpage() {
   );
 }
 
-const ContactGridPattern = ({ offsetX, offsetY, active }) => {
+const ContactGridPattern = ({
+  offsetX,
+  offsetY,
+  active,
+}) => {
   return (
     <svg className="w-full h-full">
       <defs>

@@ -4,9 +4,9 @@ import logo from "../../assets/nlp_logo.jpg";
 
 const menuItems = [
   { name: "Home", href: "/" },
-  { name: "About", href: "/about" },
-  { name: "Products & services", href: "/services" },
-  { name: "Contact", href: "/contact" },
+  { name: "About us", href: "/about" },
+  { name: "Products & Services", href: "/services" },
+  { name: "Contact us", href: "/contact" },
 ];
 
 export default function Navbar() {

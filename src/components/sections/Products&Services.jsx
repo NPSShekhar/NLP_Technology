@@ -57,7 +57,7 @@ export default function ProductsAndServices() {
             animate={isVisible ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.5, ease: "easeOut" }}
           >
-            <div className="w-[30px] h-[1px] bg-[#00B2F9]"></div>
+            <div className="w-[30px] h-[2px] bg-[#00B2F9]"></div>
 
             <span className="font-['Inter'] font-semibold text-[12px] md:text-[14px] lg:text-[16px] leading-[18px] tracking-[1.8px] uppercase text-[#00B2F9]">
               PRODUCTS & SERVICES
@@ -114,23 +114,24 @@ export default function ProductsAndServices() {
         </div>
 
         {/* Explore More Button */}
-        <motion.div
-          className="flex justify-center mt-12 sm:mt-16"
-          initial={{ opacity: 0, y: 20 }}
-          animate={isVisible ? { opacity: 1, y: 0 } : {}}
-          transition={{
-            duration: 0.6,
-            ease: "easeOut",
-            delay: 0.6,
-          }}
-        >
-          <a
-            href="/services"
-            className="flex items-center justify-center px-5 md:px-7 lg:px-8 h-[45px] md:h-[46px] lg:h-[50px] rounded-[15px] bg-[#00B2F9] font-['DM_Sans'] text-[15px] md:text-[16px] lg:text-[18px] font-medium text-[#FFFFFF] hover:bg-[#0EA5E9] hover:scale-[1.04] transition-all duration-300 ease-out active:scale-95 shadow-md w-[30px] sm:w-auto min-w-[160px]"
-          >
-            Explore More
-          </a>
-        </motion.div>
+     <motion.div
+  className="flex justify-center mt-12 sm:mt-16"
+  initial={{ opacity: 0, y: 20 }}
+  animate={isVisible ? { opacity: 1, y: 0 } : {}}
+  transition={{
+    duration: 0.6,
+    ease: "easeOut",
+    delay: 0.6,
+  }}
+>
+  <Link
+    to="/services"
+    onClick={() => window.scrollTo(0, 0)}
+    className="flex items-center justify-center px-5 md:px-7 lg:px-8 h-[45px] md:h-[46px] lg:h-[50px] rounded-[15px] bg-[#00B2F9] font-['DM_Sans'] text-[15px] md:text-[16px] lg:text-[18px] font-medium text-[#FFFFFF] hover:bg-[#0EA5E9] hover:scale-[1.04] transition-all duration-300 ease-out active:scale-95 shadow-md w-[30px] sm:w-auto min-w-[160px]"
+  >
+    Explore More
+  </Link>
+</motion.div>
       </div>
     </section>
   );

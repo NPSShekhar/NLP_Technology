@@ -5,48 +5,36 @@ import {
   useMotionTemplate,
   useAnimationFrame
 } from "framer-motion";
-import { FiZap, FiLayers } from "react-icons/fi";
+import {
+  FiDollarSign,
+  FiSettings,
+  FiCheckCircle
+} from "react-icons/fi";
+import { GlowingEffect } from "../ui/glowing-effect";
 
 const reasons = [
   {
     title: "Cost-Effective Solutions",
     description:
       "Efficient processes and lean operations that deliver value without compromising on standards.",
-    icon: <FiZap className="text-[#00B2F9] w-[23px] h-[23px]" />
+    icon: (
+      <FiDollarSign className="text-[#00B2F9] w-[28px] h-[28px]" />
+    )
   },
   {
     title: "Flexible Manufacturing",
     description:
       "From small-batch prototyping to large-scale production — we scale with your needs.",
-    icon: <FiLayers className="text-[#00B2F9] w-[22px] h-[22px]" />
+    icon: (
+      <FiSettings className="text-[#00B2F9] w-[28px] h-[28px]" />
+    )
   },
   {
     title: "Quality & Reliability",
     description:
       "Rigorous quality controls and proven processes engineered for long-term consistency.",
     icon: (
-      <svg
-        className="w-[26px] h-[25px] text-[#00B2F9]"
-        viewBox="0 0 24 24"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          d="M12 3L19 6V11.5C19 16.1 16.1 20.2 12 21.5C7.9 20.2 5 16.1 5 11.5V6L12 3Z"
-          stroke="currentColor"
-          strokeWidth="2.4"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-
-        <path
-          d="M8.5 12L10.8 14.3L15.8 9.3"
-          stroke="currentColor"
-          strokeWidth="2.4"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
+      <FiCheckCircle className="text-[#00B2F9] w-[28px] h-[28px]" />
     )
   }
 ];
@@ -104,7 +92,7 @@ export default function Whychooseus() {
       id="whychooseus"
       ref={sectionRef}
       onMouseMove={handleMouseMove}
-      className="py-[40px] md:py-18  lg:pt-[50px] lg:pb-[50px] bg-[#FFFFFF] overflow-hidden relative"
+      className="py-[40px] md:py-[40px] lg:py-[60px] bg-[#FFFFFF] overflow-hidden relative"
     >
       {/* Base Grid Background */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
@@ -129,16 +117,17 @@ export default function Whychooseus() {
         </motion.div>
       </div>
 
-      <div className="responsive-container relative z-10">
-        <div className="whychoose-shape bg-[#2A2E34] text-[#FFFFFF] rounded-[20px] p-8 sm:p-12 lg:p-16 w-full relative overflow-hidden">
+      <div className="responsive-container">
+  <div className="w-full relative overflow-hidden">
+        <div className="w-full relative overflow-hidden ">
           {/* Header */}
           <motion.div
-            className="flex items-center gap-4 mb-6 relative z-10"
+            className="flex items-center justify-center gap-4 mb-6 relative z-10"
             initial={{ opacity: 0, y: 20 }}
             animate={isVisible ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.5, ease: "easeOut" }}
           >
-            <div className="w-[30px] h-[1px] bg-[#00B2F9]"></div>
+            <div className="w-[30px] h-[2px] bg-[#00B2F9]"></div>
 
             <span className="font-['Inter'] font-semibold text-[12px] md:text-[14px] lg:text-[16px] leading-[18px] tracking-[1.8px] uppercase text-[#00B2F9]">
               why choose us
@@ -146,42 +135,49 @@ export default function Whychooseus() {
           </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, x: -40 }}
-            animate={isVisible ? { opacity: 1, x: 0 } : {}}
+            initial={{ opacity: 0, y: 20 }}
+            animate={isVisible ? { opacity: 1, y: 0 } : {}}
             transition={{
               duration: 0.7,
               ease: "easeOut",
               delay: 0.1
             }}
-            className="relative z-10"
+            className="relative z-10 flex justify-center text-center"
           >
-            <h2 className="font-['Space_Grotesk'] font-bold text-[25px] md:text-[33px] lg:text-[40px] leading-[1.2] lg:leading-[50px] lg:w-2/3">
+            <h2 className="font-['Space_Grotesk'] font-bold text-[25px] md:text-[33px] lg:text-[40px] leading-[1.2] lg:leading-[50px] text-[#2A2E34]">
               Three reasons partners stay with us.
             </h2>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 lg:gap-16 mt-12 lg:mt-16 relative z-10">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 mt-12 lg:mt-[65px] relative z-10 m-4 md:m-5 lg:m-8">
             {reasons.map((reason, index) => (
               <motion.div
                 key={index}
-                className="flex flex-col"
+               className="relative h-full bg-[#FFFFFF] rounded-[12px] p-8 lg:p-[40px] lg:pt-[40px] lg:pb-[60px] border border-[#E5E7EB] border-t-[7px] border-t-[#00B2F9] shadow-sm transition-all duration-300 ease-out  hover:shadow-lg hover:shadow-sky-100 hover:bg-white  cursor-pointer"   style={{ boxShadow: "0px 2px 8px -2px #0000000F, 0px 18px 30px -18px #00000014" }}
                 initial={{ opacity: 0, y: 30 }}
                 animate={isVisible ? { opacity: 1, y: 0 } : {}}
+                whileHover={{
+  y: -8,
+  transition: {
+    duration: 0.05,
+    ease: "easeOut",
+  },
+}}
                 transition={{
                   duration: 0.6,
                   ease: "easeOut",
                   delay: 0.2 + index * 0.1
                 }}
               >
-                <div className="w-[46px] h-[46px] rounded-[10px] bg-[#00B2F91A] flex items-center justify-center mb-6">
+                <div className="w-[57px] h-[57px] rounded-[10px] bg-[#00B2F91A] flex items-center justify-center mb-[28px]">
                   {reason.icon}
                 </div>
 
-                <h3 className="font-['Space_Grotesk'] font-medium text-[17px] md:text-[18px] lg:text-[20px] leading-[28px] tracking-[-0.4px] mb-3 text-white">
+                <h3 className="font-['Space_Grotesk'] font-medium text-[18px] md:text-[20px] lg:text-[23px] leading-[28px] tracking-[-0.4px] mb-[13px] text-[#2A2E34]">
                   {reason.title}
                 </h3>
 
-                <p className="font-['Dm_Sans'] font-normal text-[15px] md:text-[16px] lg:text-[18px] leading-[24px] text-[#A0A4AB]">
+                <p className="font-['Dm_Sans'] font-normal text-[15px] md:text-[18px] lg:text-[20px] leading-[24px] text-[#2A2E34]">
                   {reason.description}
                 </p>
               </motion.div>
@@ -189,7 +185,7 @@ export default function Whychooseus() {
           </div>
         </div>
       </div>
-
+</div>
       <style>
         {`
           .whychoose-shape {

@@ -75,7 +75,7 @@ export default function Aboutus() {
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.5, ease: "easeOut" }}
         >
-          <div className="w-[30px] h-[1px] bg-[#00B2F9]"></div>
+          <div className="w-[30px] h-[2px] bg-[#00B2F9]"></div>
 
           <span className="font-['Inter'] font-semibold text-[12px] md:text-[14px] lg:text-[16px] leading-[18px] tracking-[1.8px] uppercase text-[#00B2F9]">
             about us
@@ -96,7 +96,7 @@ export default function Aboutus() {
         </motion.h2>
 
         <motion.p
-          className="font-['DM_Sans'] font-medium text-[15px] md:text-[18px] lg:text-[20px] leading-[30.2px] text-[#64748B] mb-12 max-w-[898px]"
+          className="font-['DM_Sans'] font-normal text-[15px] md:text-[18px] lg:text-[20px] leading-[30.2px] text-[#2A2E34] mb-12 max-w-[898px]"
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{

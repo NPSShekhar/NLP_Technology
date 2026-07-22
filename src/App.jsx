@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import {
-  BrowserRouter as Router,
   Routes,
   Route,
   useLocation,
@@ -10,6 +9,8 @@ import Home from "./pages/home";
 import Aboutpage from "./pages/Aboutpage";
 import Servicespage from "./pages/Servicespage";
 import Contactpage from "./pages/Contactpage";
+import ContentPage from "./Adminpages/ContentPage";
+import PopupBanner from "./components/PopupBanner";
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -26,17 +27,24 @@ function ScrollToTop() {
 }
 
 function App() {
+  const { pathname } = useLocation();
+
   return (
-    <Router>
+    <>
       <ScrollToTop />
+      {pathname !== "/admin" && <PopupBanner />}
 
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<Aboutpage />} />
         <Route path="/services" element={<Servicespage />} />
         <Route path="/contact" element={<Contactpage />} />
+         <Route
+          path="/admin"
+          element={<ContentPage />}
+        />
       </Routes>
-    </Router>
+    </>
   );
 }
 

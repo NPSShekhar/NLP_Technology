@@ -1,6 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
 import bgcontact from "../../assets/bg_contact.png";
 import { FiMail, FiMapPin } from "react-icons/fi";
+import { useContactEnquiryForm } from "../../lib/contactForm";
+import {
+  ContactPhoneField,
+  ContactPrivacyCheckbox,
+} from "../ContactFormFields";
 
 const bgImage = bgcontact;
 
@@ -40,12 +45,16 @@ const useInView = (threshold = 0.15) => {
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) setInView(true);
+        if (entry.isIntersecting) {
+          setInView(true);
+        }
       },
       { threshold }
     );
 
-    if (ref.current) observer.observe(ref.current);
+    if (ref.current) {
+      observer.observe(ref.current);
+    }
 
     return () => observer.disconnect();
   }, [threshold]);
@@ -54,76 +63,21 @@ const useInView = (threshold = 0.15) => {
 };
 
 const ContactSection = () => {
-  const [form, setForm] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    address: "",
-    message: "",
-  });
+  const {
+    form,
+    errors,
+    submitted,
+    submitting,
+    submitError,
+    setSubmitted,
+    handleChange,
+    handlePhoneCountryChange,
+    handlePhoneChange,
+    handlePrivacyChange,
+    handleSubmit,
+  } = useContactEnquiryForm();
 
-  const [submitted, setSubmitted] = useState(false);
-  const [errors, setErrors] = useState({});
   const [sectionRef, sectionInView] = useInView();
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-
-    setForm((previousForm) => ({
-      ...previousForm,
-      [name]: value,
-    }));
-
-    if (errors[name]) {
-      setErrors((previousErrors) => ({
-        ...previousErrors,
-        [name]: "",
-      }));
-    }
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    const newErrors = {};
-
-    if (!form.name.trim()) {
-      newErrors.name = "Name is required";
-    }
-
-    if (!form.email.trim()) {
-      newErrors.email = "Email is required";
-    } else if (!/\S+@\S+\.\S+/.test(form.email)) {
-      newErrors.email = "Please enter a valid email";
-    }
-
-    if (!form.phone.trim()) {
-      newErrors.phone = "Phone number is required";
-    }
-
-    if (!form.address.trim()) {
-      newErrors.address = "Address is required";
-    }
-
-    if (!form.message.trim()) {
-      newErrors.message = "Message is required";
-    }
-
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return;
-    }
-
-    setSubmitted(true);
-
-    setForm({
-      name: "",
-      email: "",
-      phone: "",
-      address: "",
-      message: "",
-    });
-  };
 
   return (
     <>
@@ -287,7 +241,7 @@ const ContactSection = () => {
                   sectionInView ? " visible" : ""
                 }`}
               >
-                <div className="w-[28px] h-[1px] bg-[#00B2F9]" />
+                <div className="w-[30px] h-[2px] bg-[#00B2F9]" />
 
                 <span className="font-['Inter'] font-semibold text-[12px] md:text-[14px] lg:text-[16px] leading-[38px] tracking-[1.8px] uppercase text-[#00B2F9]">
                   Contact us
@@ -304,7 +258,7 @@ const ContactSection = () => {
               </h2>
 
               <p
-                className={`mt-2 font-['DM_Sans'] font-medium text-[17px] md:text-[18px] lg:text-[20px] max-h-[550px] max-w-[630px] contact-subtext${
+                className={`mt-2 font-['DM_Sans'] font-medium text-[18px] md:text-[20px] lg:text-[22px] max-h-[550px] max-w-[630px] contact-subtext${
                   sectionInView ? " visible" : ""
                 }`}
               >
@@ -312,7 +266,7 @@ const ContactSection = () => {
                 services reach out — we&apos;d love to hear from you.
               </p>
 
-              <div className="mt-10 space-y-7">
+              <div className="mt-8 space-y-7">
                 {/* Email */}
                 <div
                   className={`flex items-start gap-4 contact-info-item${
@@ -325,11 +279,11 @@ const ContactSection = () => {
                   </div>
 
                   <div>
-                    <h4 className="font-['Space_Grotesk'] font-medium text-[17px] md:text-[18px] lg:text-[19px] leading-[20px] text-[#FFFFFF]">
+                    <h4 className="font-['Space_Grotesk'] font-medium text-[18px] md:text-[19px] lg:text-[20px] leading-[20px] text-[#FFFFFF]">
                       Email
                     </h4>
 
-                    <p className="text-[15px] md:text-[16px] lg:text-[17px] font-['DM_Sans'] text-[#FFFFFF] leading-[20px] mt-2">
+                    <p className="text-[16px] md:text-[18px] lg:text-[19px] font-['DM_Sans'] text-[#FFFFFF] leading-[20px] mt-3">
                       <a href="mailto:enquiry@nlptec.com">
                         enquiry@nlptec.com
                       </a>
@@ -349,11 +303,11 @@ const ContactSection = () => {
                   </div>
 
                   <div>
-                    <h4 className="font-medium font-['Space_Grotesk'] text-[17px] md:text-[18px] lg:text-[19px] leading-[20px] text-[#FFFFFF]">
+                    <h4 className="font-medium font-['Space_Grotesk'] text-[18px] md:text-[19px] lg:text-[20px] leading-[20px] text-[#FFFFFF]">
                       Address
                     </h4>
 
-                    <p className="text-[15px] md:text-[16px] lg:text-[17px] font-['DM_Sans'] text-[#FFFFFF] leading-[24px] mt-2">
+                    <p className="text-[16px] md:text-[18px] lg:text-[19px] font-['DM_Sans'] text-[#FFFFFF] leading-[24px] mt-3">
                       NLP Technology Sdn. Bhd.
                       <br />
                       15, Jalan Pelepas 4/8, Taman Perindustrian Tanjong
@@ -369,7 +323,7 @@ const ContactSection = () => {
             {/* Right Contact Form */}
             <div className="w-full flex justify-center lg:justify-end items-center">
               <div
-                className={`w-full max-w-[660px] min-h-[436px] bg-[#FFFFFF] rounded-[10px] px-7 py-7 shadow-xl text-[#0B1C30] relative overflow-hidden contact-form-card${
+                className={`w-full max-w-[660px] md:max-w-none lg:max-w-[660px] min-h-[436px] bg-[#FFFFFF] rounded-[10px] px-7 py-7 shadow-xl text-[#0B1C30] relative overflow-hidden contact-form-card${
                   sectionInView ? " visible" : ""
                 }`}
               >
@@ -391,12 +345,12 @@ const ContactSection = () => {
                       </svg>
                     </div>
 
-                    <h3 className="contact-success-text font-['Space_Grotesk'] font-bold text-2xl text-[#1E293B]">
+                    <h3 className="contact-success-text font-['Space_Grotesk'] font-bold text-[24px] md:text-[26px] lg:text-[27px] text-[#1E293B]">
                       Request Sent!
                     </h3>
 
-                    <p className="contact-success-text mt-3 font-['DM_Sans'] text-sm text-[#64748B] max-w-[320px]">
-                      Thank you for reaching out. Our engineering team will
+                    <p className="contact-success-text mt-4 font-['DM_Sans'] text-[14px] md:text-[15px] lg:text-[17px] text-[#64748B] max-w-[320px]">
+                      Thank you for reaching out. Our team will
                       review your details and contact you within one business
                       day.
                     </p>
@@ -404,7 +358,7 @@ const ContactSection = () => {
                     <button
                       type="button"
                       onClick={() => setSubmitted(false)}
-                      className="contact-success-btn mt-8 px-6 py-2 border border-[#0EA5E9] text-[#0EA5E9] rounded-md text-sm font-medium hover:bg-[#0EA5E9] hover:text-white font-['DM_Sans']"
+                      className="contact-success-btn mt-8 px-6 py-2 border border-[#0EA5E9] text-[#0EA5E9] rounded-md text-[14px] md:text-[15px] lg:text-[16px] font-medium hover:bg-[#0EA5E9] hover:text-white font-['DM_Sans']"
                     >
                       Submit Another Request
                     </button>
@@ -413,24 +367,27 @@ const ContactSection = () => {
                   <form
                     onSubmit={handleSubmit}
                     className="flex flex-col gap-5 w-full"
+                    noValidate
                   >
                     {/* Name and Email */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                       <div className="flex flex-col gap-2">
                         <label
-                          htmlFor="name"
+                          htmlFor="home-contact-name"
                           className="text-[17px] md:text-[18px] lg:text-[19px] font-['DM_Sans'] font-medium text-[#2A2E34]"
                         >
-                          Name
+                          Name{" "}
+                          <span className="text-red-500">*</span>
                         </label>
 
                         <input
                           type="text"
-                          id="name"
+                          id="home-contact-name"
                           name="name"
                           value={form.name}
                           onChange={handleChange}
                           placeholder="Your name"
+                          autoComplete="name"
                           className={`contact-input w-full h-[44px] px-4 rounded-[7px] border bg-[#FFFFFF] text-[14px] md:text-[15px] lg:text-[16px] outline-none font-['DM_Sans'] placeholder:text-[#BEC8D2] ${
                             errors.name
                               ? "border-red-500"
@@ -447,19 +404,21 @@ const ContactSection = () => {
 
                       <div className="flex flex-col gap-2">
                         <label
-                          htmlFor="email"
+                          htmlFor="home-contact-email"
                           className="text-[17px] md:text-[18px] lg:text-[19px] font-['DM_Sans'] font-medium text-[#2A2E34]"
                         >
-                          Email
+                          Email{" "}
+                          <span className="text-red-500">*</span>
                         </label>
 
                         <input
                           type="email"
-                          id="email"
+                          id="home-contact-email"
                           name="email"
                           value={form.email}
                           onChange={handleChange}
                           placeholder="Your email address"
+                          autoComplete="email"
                           className={`contact-input w-full h-[44px] px-4 rounded-[7px] border bg-[#FFFFFF] text-[14px] md:text-[15px] lg:text-[16px] outline-none font-['DM_Sans'] placeholder:text-[#BEC8D2] ${
                             errors.email
                               ? "border-red-500"
@@ -477,50 +436,32 @@ const ContactSection = () => {
 
                     {/* Phone and Address */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                      <ContactPhoneField
+                        idPrefix="home-contact"
+                        form={form}
+                        errors={errors}
+                        onCountryChange={handlePhoneCountryChange}
+                        onPhoneChange={handlePhoneChange}
+                        selectClassName="pl-3 pr-9"
+                      />
+
                       <div className="flex flex-col gap-2">
                         <label
-                          htmlFor="phone"
+                          htmlFor="home-contact-address"
                           className="text-[17px] md:text-[18px] lg:text-[19px] font-['DM_Sans'] font-medium text-[#2A2E34]"
                         >
-                          Phone
+                          Address{" "}
+                          <span className="text-red-500">*</span>
                         </label>
 
                         <input
                           type="text"
-                          id="phone"
-                          name="phone"
-                          value={form.phone}
-                          onChange={handleChange}
-                          placeholder="Your phone number"
-                          className={`contact-input w-full h-[44px] px-4 rounded-[7px] border bg-[#FFFFFF] outline-none font-['DM_Sans'] text-[14px] md:text-[15px] lg:text-[16px] placeholder:text-[#BEC8D2] ${
-                            errors.phone
-                              ? "border-red-500"
-                              : "border-[#C9D3DF] focus:border-[#00B2F9]"
-                          }`}
-                        />
-
-                        {errors.phone && (
-                          <span className="text-red-500 text-[11px] font-['DM_Sans']">
-                            {errors.phone}
-                          </span>
-                        )}
-                      </div>
-
-                      <div className="flex flex-col gap-2">
-                        <label
-                          htmlFor="address"
-                          className="text-[17px] md:text-[18px] lg:text-[19px] font-['DM_Sans'] font-medium text-[#2A2E34]"
-                        >
-                          Address
-                        </label>
-
-                        <input
-                          type="text"
-                          id="address"
+                          id="home-contact-address"
                           name="address"
                           value={form.address}
                           onChange={handleChange}
                           placeholder="Your company address"
+                          autoComplete="street-address"
                           className={`contact-input w-full h-[44px] px-4 rounded-[7px] border bg-[#FFFFFF] outline-none font-['DM_Sans'] text-[14px] md:text-[15px] lg:text-[16px] placeholder:text-[#BEC8D2] ${
                             errors.address
                               ? "border-red-500"
@@ -539,19 +480,20 @@ const ContactSection = () => {
                     {/* Message */}
                     <div className="flex flex-col gap-2">
                       <label
-                        htmlFor="message"
+                        htmlFor="home-contact-message"
                         className="text-[17px] md:text-[18px] lg:text-[19px] font-['DM_Sans'] font-medium text-[#2A2E34]"
                       >
-                        Message/ Enquiry
+                        Message/ Enquiry{" "}
+                        <span className="text-red-500">*</span>
                       </label>
 
                       <textarea
-                        id="message"
+                        id="home-contact-message"
                         name="message"
                         value={form.message}
                         onChange={handleChange}
                         rows={4}
-                        placeholder="Tell us about your requirements ( up to 600 words )"
+                        placeholder="Tell us about your requirements (up to 600 words)"
                         className={`contact-input w-full min-h-[113px] px-4 py-3 rounded-[7px] border bg-[#FFFFFF] outline-none resize-none font-['DM_Sans'] text-[14px] md:text-[15px] lg:text-[16px] placeholder:text-[#BEC8D2] ${
                           errors.message
                             ? "border-red-500"
@@ -566,12 +508,29 @@ const ContactSection = () => {
                       )}
                     </div>
 
+                    <ContactPrivacyCheckbox
+                      idPrefix="home-contact"
+                      form={form}
+                      errors={errors}
+                      onChange={handlePrivacyChange}
+                    />
+
+                    {submitError && (
+                      <p className="rounded-[7px] bg-red-50 px-4 py-3 font-['DM_Sans'] text-[13px] text-red-600">
+                        {submitError}
+                      </p>
+                    )}
+
                     <button
                       type="submit"
-                      className="mt-2 w-full h-[48px] bg-[#00B2F9] hover:bg-[#0EA5E9] text-[#FFFFFF] rounded-[8px] font-medium font-['DM_Sans'] text-[17px] md:text-[18px] lg:text-[19px] flex items-center justify-center gap-2 hover:scale-[1.04] transition-all duration-300 ease-out active:scale-95 shadow-md"
+                      disabled={submitting}
+                      className="mt-2 w-full h-[48px] bg-[#00B2F9] hover:bg-[#0EA5E9] text-[#FFFFFF] rounded-[8px] font-medium font-['DM_Sans'] text-[17px] md:text-[18px] lg:text-[19px] flex items-center justify-center gap-2 hover:scale-[1.04] transition-all duration-300 ease-out active:scale-95 shadow-md disabled:cursor-not-allowed disabled:opacity-60"
                     >
-                      Send enquiry
-                      <SendArrowIcon className="w-4 h-4 text-[#FFFFFF]" />
+                      {submitting ? "Sending..." : "Send enquiry"}
+
+                      {!submitting && (
+                        <SendArrowIcon className="w-4 h-4 text-[#FFFFFF]" />
+                      )}
                     </button>
                   </form>
                 )}

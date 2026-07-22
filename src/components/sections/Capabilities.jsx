@@ -100,15 +100,15 @@ export default function Capabilities() {
 
       <div className="navbar-align-outer relative z-10">
         <div className="navbar-align-inner">
-          <div className="grid grid-cols-1 lg:grid-cols-[560px_1fr] gap-12 lg:gap-[110px] items-center w-full">
-            {/* Left Column: Image */}
+          <div className="grid grid-cols-1 lg:grid-cols-[560px_1fr] gap-12 lg:gap-[80px] items-center w-full">
+              {/* Left Column: Image */}
             <motion.div
               className="w-full flex justify-center order-2 lg:order-1"
               initial={{ opacity: 0, x: -40 }}
               animate={isVisible ? { opacity: 1, x: 0 } : {}}
               transition={{ duration: 0.7, ease: "easeOut", delay: 0.1 }}
             >
-              <div className="w-[430px] lg:w-full max-w-[520px] aspect-[4/5] rounded-[20px] overflow-hidden shadow-lg group">
+              <div className="w-[430px] md:w-full max-w-[520px] md:max-w-[700px] lg:max-w-[520px] aspect-[4/5] md:aspect-auto md:h-[700px] lg:h-auto lg:aspect-[4/5] rounded-[20px] overflow-hidden shadow-lg group">
                 <img
                   src={img}
                   alt="Core Competencies"
@@ -117,16 +117,16 @@ export default function Capabilities() {
               </div>
             </motion.div>
 
-            {/* Right Column: Content */}
+              {/* Right Column: Content */}
             <motion.div
-              className="w-full flex flex-col items-start order-1 lg:order-2"
+              className="w-full md:w-[calc(100%-28px)] md:mx-auto lg:w-full lg:mx-0 flex flex-col items-start order-1 lg:order-2"
               initial={{ opacity: 0, x: 40 }}
               animate={isVisible ? { opacity: 1, x: 0 } : {}}
               transition={{ duration: 0.7, ease: "easeOut", delay: 0.3 }}
             >
               {/* Header */}
               <div className="flex items-center gap-4 mb-4">
-                <div className="w-[30px] h-[1px] bg-[#00B2F9]"></div>
+                <div className="w-[30px] h-[2px] bg-[#00B2F9]"></div>
 
                 <span className="font-['Inter'] lg:items-start font-semibold text-[12px] md:text-[14px] lg:text-[16px] leading-[20px] tracking-[1.8px] uppercase text-[#00B2F9]">
                   Core Competencies
@@ -137,11 +137,11 @@ export default function Capabilities() {
                 Capability you can build a roadmap on
               </h2>
 
-            <div className="flex flex-col gap-8 w-full max-w-[700px]">
+            <div className="flex flex-col gap-8 w-full max-w-[750px]">
                 {competencies.map((item, index) => (
                   <div
                     key={index}
-                    className="p-6 min-h-[150px] flex flex-col justify-center rounded-[8px] border-l-[4px] border-[#0EA5E9] bg-[#F5F5F5] transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-lg hover:shadow-sky-100 hover:bg-white hover:border-[#0284C7] cursor-pointer"
+                    className="p-6 min-h-[170px] flex flex-col justify-center rounded-[15px] border-l-[4px] border-[#0EA5E9] bg-[#F5F5F5] transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-lg hover:shadow-sky-100 hover:bg-white hover:border-[#0284C7] cursor-pointer"
                   >
                     <h3 className="font-['Space_Grotesk'] font-medium text-[17px] md:text-[19px] lg:text-[20px] leading-[28px] tracking-[-0.36px] text-[#2A2E34] mb-4">
                       {item.title}
