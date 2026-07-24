@@ -91,7 +91,13 @@ export default function Contactpage() {
   const maskImage = useMotionTemplate`radial-gradient(150px circle at ${mouseX}px ${mouseY}px, black, transparent)`;
 
   useEffect(() => {
-    if (location.state?.scrollTo === "contact-form-section") {
+    if (window.location.hash) {
+      const id = window.location.hash.substring(1);
+      setTimeout(() => {
+        const el = document.getElementById(id);
+        if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 150);
+    } else if (location.state?.scrollTo === "contact-form-section") {
       const timer = setTimeout(() => {
         const section = document.getElementById(
           "contact-form-section"
@@ -99,20 +105,20 @@ export default function Contactpage() {
 
         if (section) {
           section.scrollIntoView({
-            behavior: "auto",
+            behavior: "smooth",
             block: "start",
           });
         }
       }, 150);
 
       return () => clearTimeout(timer);
+    } else {
+      window.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: "auto",
+      });
     }
-
-    window.scrollTo({
-      top: 0,
-      left: 0,
-      behavior: "auto",
-    });
   }, [location]);
 
   const openGoogleMaps = () => {
@@ -205,7 +211,7 @@ export default function Contactpage() {
                 duration: 0.7,
                 ease: "easeOut",
               }}
-              className="text-center mb-16 md:mb-20 lg:mb-24"
+              className="text-center mb-[30px] md:mb-[45px] lg:mb-[65px]"
             >
               <h2 className="font-['Space_Grotesk'] font-bold text-[25px] md:text-[33px] lg:text-[40px] text-[#2A2E34] mb-4">
                 Let's build something precise, together

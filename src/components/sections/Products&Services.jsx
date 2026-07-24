@@ -125,8 +125,7 @@ export default function ProductsAndServices() {
   }}
 >
   <Link
-    to="/services"
-    onClick={() => window.scrollTo(0, 0)}
+    to="/services#services-details"
     className="flex items-center justify-center px-5 md:px-7 lg:px-8 h-[45px] md:h-[46px] lg:h-[50px] rounded-[15px] bg-[#00B2F9] font-['DM_Sans'] text-[15px] md:text-[16px] lg:text-[18px] font-medium text-[#FFFFFF] hover:bg-[#0EA5E9] hover:scale-[1.04] transition-all duration-300 ease-out active:scale-95 shadow-md w-[30px] sm:w-auto min-w-[160px]"
   >
     Explore More

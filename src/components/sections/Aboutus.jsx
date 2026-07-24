@@ -113,8 +113,7 @@ export default function Aboutus() {
         </motion.p>
 
         <Link
-          to="/about"
-          onClick={() => window.scrollTo(0, 0)}
+          to="/about#about-details"
           className="inline-flex items-center justify-center px-5 md:px-7 lg:px-8 h-[45px] md:h-[46px] lg:h-[50px] rounded-[15px] bg-[#00B2F9] text-[#FFFFFF] font-['DM_Sans'] text-[15px] md:text-[16px] lg:text-[18px] font-medium leading-[24px] hover:bg-[#0EA5E9] hover:scale-[1.04] transition-all duration-300 ease-out active:scale-95 shadow-md"
         >
           Read More

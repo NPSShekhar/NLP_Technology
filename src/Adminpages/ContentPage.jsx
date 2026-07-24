@@ -8,12 +8,14 @@ import {
 } from "framer-motion";
 import PopupImageCropper from "../components/PopupImageCropper";
 import PopupPreviewModal from "../components/PopupPreviewModal";
+import AdminLogin from "./AdminLogin";
 
 const API_URL =
   import.meta.env.VITE_API_URL || "http://localhost:5001";
 
 export default function ContentPage() {
-  const [activeTab, setActiveTab] = useState("services");
+  const [activeTab, setActiveTab] = useState("popup");
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
@@ -41,6 +43,10 @@ export default function ContentPage() {
   });
 
   const maskImage = useMotionTemplate`radial-gradient(150px circle at ${mouseX}px ${mouseY}px, black, transparent)`;
+
+  if (!isAuthenticated) {
+    return <AdminLogin onLogin={() => setIsAuthenticated(true)} />;
+  }
 
   return (
     <div
@@ -77,12 +83,12 @@ export default function ContentPage() {
   NLP Technology
 </p>
 
-            <h1 className="font-['Space_Grotesk'] text-[26px] font-bold md:text-[32px] lg:text-[38px]">
+            <h1 className="font-['Space_Grotesk'] text-[20px] font-bold md:text-[32px] lg:text-[38px]">
               Content Management
             </h1>
 
-            <p className="mt-2 font-['DM_Sans'] text-[14px] text-[#CBD5E1] md:text-[16px]">
-              Add, update and delete Products & Services, Team members and Banners.
+            <p className="mt-2 font-['DM_Sans'] text-[13px] text-[#CBD5E1] md:text-[16px]">
+              Add, update and delete Banners, Team members and Products & Services.
             </p>
           </div>
 
@@ -95,23 +101,23 @@ export default function ContentPage() {
         </div>
 
         {/* Tabs */}
-        <div className="mb-8 flex gap-3 rounded-[16px] bg-[#EEF6FD] p-3 shadow-md">
+        <div className="mb-8 flex flex-nowrap gap-3 overflow-x-auto rounded-[16px] bg-[#EEF6FD] p-3 shadow-md" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
           <button
             type="button"
-            onClick={() => setActiveTab("services")}
-            className={`h-[44px] rounded-[12px] px-6 font-['DM_Sans'] text-[15px] font-semibold transition ${
-              activeTab === "services"
+            onClick={() => setActiveTab("popup")}
+            className={`flex-shrink-0 whitespace-nowrap h-[44px] rounded-[12px] border px-6 font-['DM_Sans'] text-[15px] font-semibold transition ${
+              activeTab === "popup"
                 ? "bg-[#00B2F9] text-white"
                 : "bg-[#FFFFFF] text-[#2A2E34] hover:bg-[#c4e1f8]"
             }`}
           >
-            Products & Services
+            Banner
           </button>
 
           <button
             type="button"
             onClick={() => setActiveTab("team")}
-            className={`h-[44px] rounded-[12px] px-6 font-['DM_Sans'] text-[15px] font-semibold transition ${
+            className={`flex-shrink-0 whitespace-nowrap h-[44px] rounded-[12px] border px-6 font-['DM_Sans'] text-[15px] font-semibold transition ${
               activeTab === "team"
                 ? "bg-[#00B2F9] text-white"
                 : "bg-[#FFFFFF] text-[#2A2E34] hover:bg-[#c4e1f8]"
@@ -122,14 +128,14 @@ export default function ContentPage() {
 
           <button
             type="button"
-            onClick={() => setActiveTab("popup")}
-            className={`h-[44px] rounded-[12px] px-6 font-['DM_Sans'] text-[15px] font-semibold transition ${
-              activeTab === "popup"
+            onClick={() => setActiveTab("services")}
+            className={`flex-shrink-0 whitespace-nowrap h-[44px] border rounded-[12px] px-6 font-['DM_Sans'] text-[15px] font-semibold transition ${
+              activeTab === "services"
                 ? "bg-[#00B2F9] text-white"
                 : "bg-[#FFFFFF] text-[#2A2E34] hover:bg-[#c4e1f8]"
             }`}
           >
-            Banner
+            Products & Services
           </button>
         </div>
 
@@ -165,6 +171,7 @@ function ServicesManager() {
 
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [serviceToDelete, setServiceToDelete] = useState(null);
 
   const fetchServices = async () => {
     try {
@@ -328,19 +335,19 @@ function ServicesManager() {
     }
   };
 
-  const handleDelete = async (service) => {
-    const confirmed = window.confirm(
-      `Delete "${service.title}"?`
-    );
+  const confirmDelete = (service) => {
+    setServiceToDelete(service);
+  };
 
-    if (!confirmed) {
-      return;
-    }
+  const handleDelete = async () => {
+    if (!serviceToDelete) return;
+    const service = serviceToDelete;
 
     try {
       setDeletingId(service.id);
       setError("");
       setSuccess("");
+      setServiceToDelete(null);
 
       const response = await fetch(
         `${API_URL}/api/services/${service.id}`,
@@ -376,6 +383,15 @@ function ServicesManager() {
 
   return (
     <div className="grid grid-cols-1 gap-8 xl:grid-cols-[430px_1fr]">
+      {serviceToDelete && (
+        <DeleteConfirmModal
+          title="Delete Product & Service"
+          message={`Are you sure you want to delete "${serviceToDelete.title}"? This action cannot be undone.`}
+          onConfirm={handleDelete}
+          onCancel={() => setServiceToDelete(null)}
+          isDeleting={deletingId === serviceToDelete.id}
+        />
+      )}
       {/* Form */}
       <section className="h-fit rounded-[20px] bg-[#EEF6FD] p-6 shadow-md md:p-8">
         <div className="mb-6">
@@ -463,7 +479,7 @@ function ServicesManager() {
             <button
               type="submit"
               disabled={submitting}
-              className="inline-flex h-[46px] flex-1 items-center justify-center rounded-[12px] bg-[#00B2F9] px-6 font-['DM_Sans'] text-[15px] font-semibold text-white transition hover:bg-[#0EA5E9] disabled:cursor-not-allowed disabled:opacity-60"
+              className="inline-flex h-[54px] md:h-[46px] flex-1 items-center justify-center rounded-[12px] bg-[#00B2F9] px-6 font-['DM_Sans'] text-[15px] font-semibold text-white transition hover:bg-[#0EA5E9] disabled:cursor-not-allowed disabled:opacity-60"
             >
               {submitting
                 ? "Saving..."
@@ -476,7 +492,7 @@ function ServicesManager() {
               <button
                 type="button"
                 onClick={resetForm}
-                className="inline-flex h-[46px] items-center justify-center rounded-[12px] bg-[#FFFFFF] px-6 font-['DM_Sans'] text-[15px] font-semibold text-[#2A2E34] transition hover:bg-[#c4e1f8]"
+                className="inline-flex h-[54px] md:h-[46px] items-center justify-center rounded-[12px] bg-[#FFFFFF] px-6 font-['DM_Sans'] text-[15px] font-semibold text-[#2A2E34] transition hover:bg-[#c4e1f8]"
               >
                 Cancel
               </button>
@@ -487,22 +503,22 @@ function ServicesManager() {
 
       {/* Services list */}
       <section>
-        <div className="mb-5 flex items-center justify-between">
-          <div>
-            <p className="mb-2 inline-flex items-center gap-3 font-['DM_Sans'] text-[13px] md:text-[14px] lg:text-[14px] font-bold uppercase tracking-[1.5px] text-[#00B2F9]">
-                <span className="block w-[22px] h-[2px] bg-[#00B2F9] flex-shrink-0"></span>
-              Existing Products & Services
-            </p>
+        <div className="mb-5 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+  <div>
+    <p className="mb-2 inline-flex items-center gap-3 font-['DM_Sans'] text-[14px] lg:text-[14px] font-bold uppercase tracking-[1.5px] text-[#00B2F9]">
+      <span className="block h-[2px] w-[22px] flex-shrink-0 bg-[#00B2F9]"></span>
+      Existing Products & Services
+    </p>
 
-            <h2 className="font-['Space_Grotesk'] text-[25px] font-bold text-[#2A2E34]">
-              Manage Products & Services
-            </h2>
-          </div>
+    <h2 className="font-['Space_Grotesk'] text-[25px] font-bold text-[#2A2E34]">
+      Manage Products & Services
+    </h2>
+  </div>
 
-          <span className="rounded-full bg-[#2A2E34] px-4 py-2 font-['DM_Sans'] text-[13px] md:text-[14px] lg:text-[14px] font-semibold text-white">
-            {services.length} Products & Services
-          </span>
-        </div>
+  <span className="w-fit rounded-full bg-[#2A2E34] px-4 py-2 font-['DM_Sans'] text-[13px] md:text-[14px] lg:text-[14px] font-semibold text-white">
+    {services.length} Products & Services
+  </span>
+</div>
 
         {loading ? (
           <LoadingMessage text="Loading Products & Services..." />
@@ -565,7 +581,7 @@ function ServicesManager() {
 
                       <button
                         type="button"
-                        onClick={() => handleDelete(service)}
+                        onClick={() => confirmDelete(service)}
                         disabled={deletingId === service.id}
                         className="inline-flex h-[42px] flex-1 items-center justify-center rounded-[10px] bg-[#FEECEC] px-4 font-['DM_Sans'] text-[14px] font-semibold text-[#DC2626] transition hover:bg-[#FDDDDD] disabled:cursor-not-allowed disabled:opacity-60"
                       >
@@ -604,6 +620,7 @@ function TeamMembersManager() {
 
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [memberToDelete, setMemberToDelete] = useState(null);
 
   const fetchTeamMembers = async () => {
     try {
@@ -761,19 +778,19 @@ function TeamMembersManager() {
     }
   };
 
-  const handleDelete = async (member) => {
-    const confirmed = window.confirm(
-      `Delete "${member.name}"?`
-    );
+  const confirmDelete = (member) => {
+    setMemberToDelete(member);
+  };
 
-    if (!confirmed) {
-      return;
-    }
+  const handleDelete = async () => {
+    if (!memberToDelete) return;
+    const member = memberToDelete;
 
     try {
       setDeletingId(member.id);
       setError("");
       setSuccess("");
+      setMemberToDelete(null);
 
       const response = await fetch(
         `${API_URL}/api/team-members/${member.id}`,
@@ -810,6 +827,15 @@ function TeamMembersManager() {
 
   return (
     <div className="grid grid-cols-1 gap-8 xl:grid-cols-[430px_1fr]">
+      {memberToDelete && (
+        <DeleteConfirmModal
+          title="Delete Team Member"
+          message={`Are you sure you want to delete "${memberToDelete.name}"? This action cannot be undone.`}
+          onConfirm={handleDelete}
+          onCancel={() => setMemberToDelete(null)}
+          isDeleting={deletingId === memberToDelete.id}
+        />
+      )}
       {/* Form */}
       <section className="h-fit rounded-[20px] bg-[#EEF6FD] p-6 shadow-md md:p-8">
         <div className="mb-6">
@@ -884,7 +910,7 @@ function TeamMembersManager() {
             <button
               type="submit"
               disabled={submitting}
-              className="inline-flex h-[46px] flex-1 items-center justify-center rounded-[12px] bg-[#00B2F9] px-6 font-['DM_Sans'] text-[15px] font-semibold text-white transition hover:bg-[#0EA5E9] disabled:cursor-not-allowed disabled:opacity-60"
+              className="inline-flex h-[54px] md:h-[46px] flex-1 items-center justify-center rounded-[12px] bg-[#00B2F9] px-6 font-['DM_Sans'] text-[15px] font-semibold text-white transition hover:bg-[#0EA5E9] disabled:cursor-not-allowed disabled:opacity-60"
             >
               {submitting
                 ? "Saving..."
@@ -897,7 +923,7 @@ function TeamMembersManager() {
               <button
                 type="button"
                 onClick={resetForm}
-                className="inline-flex h-[46px] items-center justify-center rounded-[12px] bg-[#FFFFFF] px-6 font-['DM_Sans'] text-[15px] font-semibold text-[#2A2E34] transition hover:bg-[#c4e1f8]"
+                className="inline-flex h-[54px] md:h-[46px] items-center justify-center rounded-[12px] bg-[#FFFFFF] px-6 font-['DM_Sans'] text-[15px] font-semibold text-[#2A2E34] transition hover:bg-[#c4e1f8]"
               >
                 Cancel
               </button>
@@ -908,22 +934,22 @@ function TeamMembersManager() {
 
       {/* Team list */}
       <section>
-        <div className="mb-5 flex items-center justify-between">
-          <div>
-            <p className="inline-flex items-center gap-3 mb-2 font-['DM_Sans'] text-[13px] md:text-[14px] lg:text-[14px] font-bold uppercase tracking-[1.5px] text-[#00B2F9]">
-                <span className="block w-[22px] h-[2px] bg-[#00B2F9] flex-shrink-0"></span>
-              Existing members
-            </p>
+        <div className="mb-5 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+  <div>
+    <p className="mb-2 inline-flex items-center gap-3 font-['DM_Sans'] text-[13px] md:text-[14px] lg:text-[14px] font-bold uppercase tracking-[1.5px] text-[#00B2F9]">
+      <span className="block h-[2px] w-[22px] flex-shrink-0 bg-[#00B2F9]"></span>
+      Existing members
+    </p>
 
-            <h2 className="font-['Space_Grotesk'] text-[25px] font-bold text-[#2A2E34]">
-              Manage team
-            </h2>
-          </div>
+    <h2 className="font-['Space_Grotesk'] text-[25px] font-bold text-[#2A2E34]">
+      Manage team
+    </h2>
+  </div>
 
-          <span className="rounded-full bg-[#2A2E34] px-4 py-2 font-['DM_Sans'] text-[13px] md:text-[14px] lg:text-[14px] font-semibold text-white">
-            {teamMembers.length} Members
-          </span>
-        </div>
+  <span className="w-fit rounded-full bg-[#2A2E34] px-4 py-2 font-['DM_Sans'] text-[13px] md:text-[14px] lg:text-[14px] font-semibold text-white">
+    {teamMembers.length} Members
+  </span>
+</div>
 
         {loading ? (
           <LoadingMessage text="Loading team members..." />
@@ -962,7 +988,7 @@ function TeamMembersManager() {
 
                     <button
                       type="button"
-                      onClick={() => handleDelete(member)}
+                      onClick={() => confirmDelete(member)}
                       disabled={deletingId === member.id}
                       className="inline-flex h-[42px] flex-1 items-center justify-center rounded-[10px] bg-[#FEECEC] px-4 font-['DM_Sans'] text-[14px] font-semibold text-[#DC2626] transition hover:bg-[#FDDDDD] disabled:cursor-not-allowed disabled:opacity-60"
                     >
@@ -1384,7 +1410,7 @@ function PopupBannerManager() {
                 type="button"
                 onClick={handlePreviewForm}
                 disabled={!preview || !croppedSize}
-                className="inline-flex h-[46px] flex-1 items-center justify-center rounded-[12px] bg-[#FFFFFF] px-6 font-['DM_Sans'] text-[15px] font-semibold text-[#00A3E6] transition hover:bg-[#c4e1f8] disabled:cursor-not-allowed disabled:opacity-60"
+                className="inline-flex h-[54px] md:h-[46px] flex-1 items-center border border-[#D1D5DB] justify-center rounded-[12px] bg-[#fcfbfb] px-6 font-['DM_Sans'] text-[15px] font-semibold text-[#00A3E6] transition hover:bg-[#c4e1f8] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 Preview
               </button>
@@ -1392,7 +1418,7 @@ function PopupBannerManager() {
               <button
                 type="submit"
                 disabled={submitting}
-                className="inline-flex h-[46px] flex-1 items-center justify-center rounded-[12px] bg-[#00B2F9] px-6 font-['DM_Sans'] text-[15px] font-semibold text-white transition hover:bg-[#0EA5E9] disabled:cursor-not-allowed disabled:opacity-60"
+                className="inline-flex h-[54px] md:h-[46px] flex-1 items-center justify-center rounded-[12px] bg-[#00B2F9] px-6 font-['DM_Sans'] text-[15px] font-semibold text-white transition hover:bg-[#0EA5E9] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {submitting
                   ? "Saving..."
@@ -1406,7 +1432,7 @@ function PopupBannerManager() {
               <button
                 type="button"
                 onClick={resetForm}
-                className="inline-flex h-[46px] items-center justify-center rounded-[12px] bg-[#FFFFFF] px-6 font-['DM_Sans'] text-[15px] font-semibold text-[#2A2E34] transition hover:bg-[#c4e1f8]"
+                className="inline-flex h-[54px] md:h-[46px] items-center justify-center rounded-[12px] bg-[#FFFFFF] px-6 font-['DM_Sans'] text-[15px] font-semibold text-[#2A2E34] transition hover:bg-[#c4e1f8]"
               >
                 Cancel
               </button>
@@ -1415,22 +1441,22 @@ function PopupBannerManager() {
         </section>
 
         <section>
-          <div className="mb-5 flex items-center justify-between">
-            <div>
-              <p className="mb-2 inline-flex items-center gap-3 font-['DM_Sans'] text-[13px] md:text-[14px] lg:text-[14px] font-bold uppercase tracking-[1.5px] text-[#00B2F9]">
-                <span className="block w-[22px] h-[2px] bg-[#00B2F9] flex-shrink-0"></span>
-                Existing banners
-              </p>
+         <div className="mb-5 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+  <div>
+    <p className="mb-2 inline-flex items-center gap-3 font-['DM_Sans'] text-[13px] md:text-[14px] lg:text-[14px] font-bold uppercase tracking-[1.5px] text-[#00B2F9]">
+      <span className="block h-[2px] w-[22px] flex-shrink-0 bg-[#00B2F9]"></span>
+      Existing banners
+    </p>
 
-              <h2 className="font-['Space_Grotesk'] text-[25px] font-bold text-[#2A2E34]">
-                Manage banners
-              </h2>
-            </div>
+    <h2 className="font-['Space_Grotesk'] text-[25px] font-bold text-[#2A2E34]">
+      Manage banners
+    </h2>
+  </div>
 
-            <span className="rounded-full bg-[#2A2E34] px-4 py-2 font-['DM_Sans'] text-[13px] md:text-[14px] lg:text-[14px] font-semibold text-white">
-              {popups.length} Banners
-            </span>
-          </div>
+  <span className="w-fit rounded-full bg-[#2A2E34] px-4 py-2 font-['DM_Sans'] text-[13px] md:text-[14px] lg:text-[14px] font-semibold text-white">
+    {popups.length} Banners
+  </span>
+</div>
 
           {loading ? (
             <LoadingMessage text="Loading banners..." />
@@ -1449,7 +1475,7 @@ function PopupBannerManager() {
                     </p>
 
                     {popup.is_active ? (
-                      <span className="rounded-full bg-[#15803D] px-4 py-1.5 font-['DM_Sans'] text-[12px] font-semibold text-white">
+                      <span className="rounded-full bg-[#15803D] px-4 py-1.5 font-['DM_Sans'] text-[9px] md:text-[12px] font-semibold text-white">
                         Showing on website
                       </span>
                     ) : (

@@ -42,6 +42,18 @@ export default function Servicespage() {
   const maskImage = useMotionTemplate`radial-gradient(150px circle at ${mouseX}px ${mouseY}px, black, transparent)`;
 
   useEffect(() => {
+    if (window.location.hash) {
+      const id = window.location.hash.substring(1);
+      setTimeout(() => {
+        const el = document.getElementById(id);
+        if (el) el.scrollIntoView({ behavior: "smooth" });
+      }, 100);
+    } else {
+      window.scrollTo(0, 0);
+    }
+  }, []);
+
+  useEffect(() => {
     const controller = new AbortController();
 
     const fetchServices = async () => {
@@ -129,6 +141,7 @@ export default function Servicespage() {
 
         {/* Content Section */}
         <section
+          id="services-details"
           onMouseMove={handleMouseMove}
           className="relative overflow-hidden py-16 md:py-20"
         >
@@ -255,7 +268,7 @@ export default function Servicespage() {
                           {service.title}
                         </h3>
 
-                        <p className="text-[14px] md:text-[17px] lg:text-[18px] font-['DM_Sans'] text-[#6B7280] leading-relaxed mb-6">
+                        <p className="text-[14px] sm:text-[16px] md:text-[18px] lg:text-[20px] font-['DM_Sans'] text-[#6B7280] leading-relaxed mb-6">
                           {service.description}
                         </p>
 

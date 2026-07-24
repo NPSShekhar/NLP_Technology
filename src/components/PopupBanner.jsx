@@ -56,7 +56,10 @@ export default function PopupBanner() {
         }
 
         setPopup(data.popup);
-        setVisible(true);
+
+        setTimeout(() => {
+          setVisible(true);
+        }, 1200);
       } catch (error) {
         console.error("Fetch active popup error:", error);
       }
@@ -69,13 +72,25 @@ export default function PopupBanner() {
     setVisible(false);
   };
 
-  if (isReloadNavigation() || !visible || !popup) {
+  if (isReloadNavigation() || !popup) {
     return null;
   }
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 px-4">
-      <div className="relative">
+    <div
+      className={`fixed inset-0 z-[9999] flex items-center justify-center px-4 transition-all duration-500 ease-out ${
+        visible
+          ? "bg-black/70 opacity-100"
+          : "bg-black/0 opacity-0 pointer-events-none"
+      }`}
+    >
+      <div
+        className={`relative transform transition-all duration-500 ease-out ${
+          visible
+            ? "scale-100 opacity-100 translate-y-0"
+            : "scale-95 opacity-0 translate-y-4"
+        }`}
+      >
         <button
           type="button"
           onClick={handleClose}
@@ -85,13 +100,14 @@ export default function PopupBanner() {
           ×
         </button>
 
-        <div className="border-[3px] border-white">
+        <div className="border-[3px] border-white max-w-full max-h-[90vh] flex">
           <img
             src={popup.image}
             alt="Promotional banner"
+            className="max-w-full max-h-[85vh] object-contain"
             style={{
               width: `${popup.width}px`,
-              height: `${popup.height}px`,
+              height: "auto",
               display: "block",
             }}
           />

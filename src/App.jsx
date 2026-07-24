@@ -13,15 +13,17 @@ import ContentPage from "./Adminpages/ContentPage";
 import PopupBanner from "./components/PopupBanner";
 
 function ScrollToTop() {
-  const { pathname } = useLocation();
+  const { pathname, hash, state } = useLocation();
 
   useEffect(() => {
-    window.scrollTo({
-      top: 0,
-      left: 0,
-      behavior: "smooth",
-    });
-  }, [pathname]);
+    if (!hash && !state?.scrollTo) {
+      window.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: "smooth",
+      });
+    }
+  }, [pathname, hash, state]);
 
   return null;
 }

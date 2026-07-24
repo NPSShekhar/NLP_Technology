@@ -99,6 +99,18 @@ export default function Aboutpage() {
   };
 
   useEffect(() => {
+    if (window.location.hash) {
+      const id = window.location.hash.substring(1);
+      setTimeout(() => {
+        const el = document.getElementById(id);
+        if (el) el.scrollIntoView({ behavior: "smooth" });
+      }, 100);
+    } else {
+      window.scrollTo(0, 0);
+    }
+  }, []);
+
+  useEffect(() => {
     const controller = new AbortController();
 
     const fetchTeamMembers = async () => {
@@ -264,6 +276,7 @@ export default function Aboutpage() {
         </section>
 
         <section
+          id="about-details"
           onMouseMove={handleMouseMove}
           className="relative overflow-hidden py-16 md:py-20"
         >
@@ -334,7 +347,7 @@ export default function Aboutpage() {
                   engineered in Malaysia
                 </h2>
 
-                <p className="text-[14px] md:text-[16px] lg:text-[18px] font-['DM_Sans'] text-[#64748B] leading-relaxed mb-4">
+                <p className="text-[14px] sm:text-[16px] md:text-[18px] lg:text-[20px] font-['DM_Sans'] text-[#64748B] leading-relaxed mb-4">
                   NLP Technology Sdn. Bhd. is a
                   Malaysia-based contract manufacturing
                   company for the semiconductor,
@@ -346,7 +359,7 @@ export default function Aboutpage() {
                   large-scale manufacturing.
                 </p>
 
-                <p className="text-[14px] md:text-[16px] lg:text-[18px] font-['DM_Sans'] text-[#64748B] leading-relaxed">
+                <p className="text-[14px] sm:text-[16px] md:text-[18px] lg:text-[20px] font-['DM_Sans'] text-[#64748B] leading-relaxed">
                   Strategically located in Malaysia, our
                   facilities are equipped with advanced
                   technologies and managed by an
@@ -417,7 +430,7 @@ export default function Aboutpage() {
                   OUR MISSION
                 </span>
 
-                <p className="text-[14px] md:text-[17px] lg:text-[18px] text-[#2A2E34] font-['DM_Sans'] leading-relaxed">
+                <p className="text-[14px] sm:text-[16px] md:text-[18px] lg:text-[20px] text-[#2A2E34] font-['DM_Sans'] leading-relaxed">
                   To empower our customers by delivering
                   reliable, high-quality manufacturing
                   services that drive innovation, cost
@@ -433,7 +446,7 @@ export default function Aboutpage() {
                   OUR VISION
                 </span>
 
-                <p className="text-[14px] md:text-[17px] lg:text-[18px] font-['DM_Sans'] text-[#2A2E34] leading-relaxed">
+                <p className="text-[14px] sm:text-[16px] md:text-[18px] lg:text-[20px] font-['DM_Sans'] text-[#2A2E34] leading-relaxed">
                   To be a competitive manufacturing
                   partner in Asia, recognised for
                   quality, integrity and long-term
@@ -500,7 +513,7 @@ export default function Aboutpage() {
                 <div className="flex flex-col md:flex-row gap-6 h-auto md:h-[400px] lg:h-[500px] overflow-hidden">
                   {/* Static Team Intro Card */}
                   <div className="w-full md:w-[calc(33.333333%_-_16px)] lg:w-[calc(25%_-_18px)] shrink-0 bg-[#2A2E34] rounded-[8px] p-8 md:p-10 flex flex-col justify-center text-[#FFFFFF] relative h-[400px] lg:h-[500px]">
-                    <p className="text-[14px] md:text-[15px] lg:text-[18px] font-['DM_Sans'] leading-relaxed md:leading-[1.4] lg:leading-relaxed mb-10">
+                    <p className="text-[14px] sm:text-[16px] md:text-[18px] lg:text-[20px] font-['DM_Sans'] leading-relaxed md:leading-[1.4] lg:leading-relaxed mb-10">
                       "Our team is led by experienced
                       engineers with strong technical
                       background, ensuring that every
@@ -598,7 +611,7 @@ export default function Aboutpage() {
               </h2>
 
               <Link
-                to="/contact"
+                to="/contact#contact-form-section"
                 className="inline-flex items-center justify-center px-5 md:px-7 lg:px-8 h-[45px] md:h-[46px] lg:h-[50px] rounded-[15px] bg-[#2A2E34] text-[#FFFFFF] font-['DM_Sans'] text-[15px] md:text-[16px] lg:text-[18px] font-medium leading-[24px] hover:bg-[#3E4850] hover:scale-[1.04] transition-all duration-300 ease-out active:scale-95 shadow-md"
               >
                 Get in touch
