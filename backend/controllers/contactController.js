@@ -73,7 +73,7 @@ const createContactEnquiry = async (req, res) => {
 
     const enquiry = insertResult.rows[0];
 
-    await transporter.sendMail({
+    const mailOptions = {
       from: process.env.MAIL_FROM,
       to: process.env.ADMIN_EMAIL,
       replyTo: email,
@@ -126,7 +126,18 @@ ${message}
           </p>
         </div>
       `,
-    });
+    };
+
+    if (req.file) {
+      mailOptions.attachments = [
+        {
+          filename: req.file.originalname,
+          content: req.file.buffer,
+        },
+      ];
+    }
+
+    await transporter.sendMail(mailOptions);
 
     const updateResult = await client.query(
       `

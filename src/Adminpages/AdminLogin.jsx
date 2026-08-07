@@ -105,7 +105,7 @@ export default function AdminLogin({ onLogin }) {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="group relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-[14px] bg-[#2A2E34] py-4 text-[16px] font-semibold text-white transition-all duration-300 hover:bg-[#1A1D21] hover:shadow-lg hover:shadow-[#2A2E34]/20 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-80"
+              className="group relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-[14px] bg-[#00B2F9] py-4 text-[16px] font-semibold text-white transition-all duration-300 hover:bg-[#0091C8] hover:shadow-lg hover:shadow-[#2A2E34]/20 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-80"
             >
               <span className="relative z-10 flex items-center gap-2">
                 {isSubmitting ? "Authenticating..." : "Sign In"}

@@ -177,7 +177,7 @@ export default function Whychooseus() {
                   {reason.title}
                 </h3>
 
-                <p className="font-['Dm_Sans'] font-normal text-[15px] md:text-[18px] lg:text-[20px] leading-[24px] text-[#2A2E34]">
+                <p className="font-['Dm_Sans'] font-normal text-[15px] md:text-[18px] lg:text-[20px] leading-[24px] text-[#3E4850]">
                   {reason.description}
                 </p>
               </motion.div>

@@ -9,6 +9,8 @@ import Home from "./pages/home";
 import Aboutpage from "./pages/Aboutpage";
 import Servicespage from "./pages/Servicespage";
 import Contactpage from "./pages/Contactpage";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsConditions from "./pages/TermsConditions";
 import ContentPage from "./Adminpages/ContentPage";
 import PopupBanner from "./components/PopupBanner";
 
@@ -41,7 +43,9 @@ function App() {
         <Route path="/about" element={<Aboutpage />} />
         <Route path="/services" element={<Servicespage />} />
         <Route path="/contact" element={<Contactpage />} />
-         <Route
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/terms-and-conditions" element={<TermsConditions />} />
+        <Route
           path="/admin"
           element={<ContentPage />}
         />

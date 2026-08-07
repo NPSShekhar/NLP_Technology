@@ -96,7 +96,7 @@ export default function Aboutus() {
         </motion.h2>
 
         <motion.p
-          className="font-['DM_Sans'] font-normal text-[15px] md:text-[18px] lg:text-[20px] leading-[30.2px] text-[#2A2E34] mb-12 max-w-[898px]"
+          className="font-['DM_Sans'] font-normal text-[15px] md:text-[18px] lg:text-[20px] leading-[30.2px] text-[#3E4850] mb-12 max-w-[898px]"
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{

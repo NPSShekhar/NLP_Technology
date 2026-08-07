@@ -147,7 +147,7 @@ export default function Capabilities() {
                       {item.title}
                     </h3>
 
-                    <p className="font-['Dm_Sans'] font-normal text-[15px] md:text-[17px] lg:text-[18px] leading-[22px] text-[#2A2E34] max-w-[557px]">
+                    <p className="font-['Dm_Sans'] font-normal text-[15px] md:text-[17px] lg:text-[18px] leading-[22px] text-[#3E4850] max-w-[557px]">
                       {item.description}
                     </p>
                   </div>

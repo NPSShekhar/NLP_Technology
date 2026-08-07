@@ -1,26 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
-import img1 from "../../assets/serviceimg1.png";
-import img2 from "../../assets/serviceimg2.png";
-import img3 from "../../assets/serviceimg3.png";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 
-const services = [
-  {
-    title: "Contract Manufacturing & Equipment Contract Manufacturing (ECM)",
-    image: img1,
-  },
-  {
-    title: "After Sales & Service Support",
-    image: img2,
-  },
-  {
-    title: "Spare Parts Support",
-    image: img3,
-  },
-];
+const API_URL =
+  import.meta.env.VITE_API_URL || "http://localhost:5001";
 
 export default function ProductsAndServices() {
+  const [services, setServices] = useState([]);
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef(null);
 
@@ -40,6 +26,42 @@ export default function ProductsAndServices() {
     }
 
     return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    const fetchServices = async () => {
+      try {
+        const response = await fetch(`${API_URL}/api/services`, {
+          signal: controller.signal,
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            data.message || "Failed to fetch services"
+          );
+        }
+
+        const serviceList = Array.isArray(data.services)
+          ? data.services
+          : [];
+
+        setServices(serviceList.slice(0, 3));
+      } catch (fetchError) {
+        if (fetchError.name !== "AbortError") {
+          console.error("Homepage services fetch error:", fetchError);
+        }
+      }
+    };
+
+    fetchServices();
+
+    return () => {
+      controller.abort();
+    };
   }, []);
 
   return (
@@ -82,7 +104,7 @@ export default function ProductsAndServices() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {services.map((service, index) => (
             <motion.div
-              key={index}
+              key={service.id}
               className="group relative rounded-[20px] overflow-hidden shadow-[0px_10px_30px_rgba(0,0,0,0.05)] transition-all duration-300 ease-out hover:-translate-y-2 hover:scale-[1.02] hover:shadow-[0px_20px_40px_rgba(0,0,0,0.1)]"
               initial={{ opacity: 0, y: 40 }}
               animate={isVisible ? { opacity: 1, y: 0 } : {}}

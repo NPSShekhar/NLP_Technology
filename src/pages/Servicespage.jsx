@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Navbar from "../components/Layout/navbar";
 import Footer from "../components/Layout/Footer";
 import heroBg from "../assets/service_herobg.png";
@@ -8,9 +8,141 @@ import {
   useMotionTemplate,
   useAnimationFrame,
 } from "framer-motion";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+
+function RelatedProductsCarousel({ products }) {
+  const scrollRef = useRef(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  const updateScrollState = () => {
+    const container = scrollRef.current;
+
+    if (!container) {
+      return;
+    }
+
+    setCanScrollLeft(container.scrollLeft > 0);
+    setCanScrollRight(
+      container.scrollLeft + container.clientWidth <
+        container.scrollWidth - 1
+    );
+  };
+
+  useEffect(() => {
+    updateScrollState();
+
+    const container = scrollRef.current;
+
+    if (!container) {
+      return undefined;
+    }
+
+    container.addEventListener("scroll", updateScrollState);
+    window.addEventListener("resize", updateScrollState);
+
+    return () => {
+      container.removeEventListener("scroll", updateScrollState);
+      window.removeEventListener("resize", updateScrollState);
+    };
+  }, [products]);
+
+  const scrollByDirection = (direction) => {
+    const container = scrollRef.current;
+
+    if (!container) {
+      return;
+    }
+
+    const card = container.querySelector("[data-related-card]");
+
+    if (!card) {
+      return;
+    }
+
+    const gap = 24;
+    const scrollAmount = card.offsetWidth + gap;
+
+    container.scrollBy({
+      left: direction * scrollAmount,
+      behavior: "smooth",
+    });
+  };
+
+const showArrows =
+  window.innerWidth < 640
+    ? products.length > 1
+    : window.innerWidth < 1024
+    ? products.length > 2
+    : products.length > 4;
+  return (
+    <div className="w-full">
+      <h4 className="font-['Space_Grotesk'] font-semibold text-[22px] md:text-[26px] text-[#2A2E34] mb-5 md:mb-6">
+        Related Products
+      </h4>
+
+      <div
+        ref={scrollRef}
+        className="flex gap-5 md:gap-6 overflow-hidden scroll-smooth"
+        onWheel={(event) => event.preventDefault()}
+      >
+        {products.map((product) => (
+          <div
+            key={product.id}
+            data-related-card
+            className="bg-[#FFFFFF] rounded-[14px] overflow-hidden shadow-[0px_4px_20px_rgba(0,0,0,0.06)] flex-shrink-0 w-full sm:w-[calc(50%-10px)] lg:w-[calc(25%-18px)]"
+          >
+            <div className="w-full aspect-[16/9] overflow-hidden">
+              <img
+                src={product.image}
+                alt={product.title}
+                className="w-full h-full object-cover"
+              />
+            </div>
+
+            <div className="p-5">
+              <h5 className="font-['Space_Grotesk'] font-bold text-[16px] md:text-[19px] lg:text-[22px] text-[#2A2E34] mb-2 leading-snug">
+                {product.title}
+              </h5>
+
+              <p className="font-['DM_Sans'] text-[14px] md:text-[16px] lg:text-[18px] text-[#3E4850] leading-relaxed">
+                {product.description}
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {showArrows && (
+        <div className="mt-5 flex justify-end gap-2">
+          <button
+            type="button"
+            onClick={() => scrollByDirection(-1)}
+            disabled={!canScrollLeft}
+            aria-label="Previous related products"
+            className="inline-flex h-[40px] w-[40px] items-center justify-center rounded-full bg-[#FFFFFF] text-[#00B2F9] shadow-[0px_4px_20px_rgba(0,0,0,0.06)] transition hover:bg-[#EEF6FD] disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            <ChevronLeft size={20} strokeWidth={2} />
+          </button>
+
+          <button
+            type="button"
+            onClick={() => scrollByDirection(1)}
+            disabled={!canScrollRight}
+            aria-label="Next related products"
+            className="inline-flex h-[40px] w-[40px] items-center justify-center rounded-full bg-[#FFFFFF] text-[#00B2F9] shadow-[0px_4px_20px_rgba(0,0,0,0.06)] transition hover:bg-[#EEF6FD] disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            <ChevronRight size={20} strokeWidth={2} />
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function Servicespage() {
   const [services, setServices] = useState([]);
+  const [relatedProductsByService, setRelatedProductsByService] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -56,7 +188,7 @@ export default function Servicespage() {
   useEffect(() => {
     const controller = new AbortController();
 
-    const fetchServices = async () => {
+    const fetchPageData = async () => {
       try {
         setLoading(true);
         setError("");
@@ -64,33 +196,68 @@ export default function Servicespage() {
         const apiUrl =
           import.meta.env.VITE_API_URL || "http://localhost:5001";
 
-        const response = await fetch(`${apiUrl}/api/services`, {
-          method: "GET",
-          signal: controller.signal,
-        });
+        const [servicesResponse, relatedProductsResponse] =
+          await Promise.all([
+            fetch(`${apiUrl}/api/services`, {
+              method: "GET",
+              signal: controller.signal,
+            }),
+            fetch(`${apiUrl}/api/related-products`, {
+              method: "GET",
+              signal: controller.signal,
+            }),
+          ]);
 
-        const data = await response.json();
+        const servicesData = await servicesResponse.json();
+        const relatedProductsData =
+          await relatedProductsResponse.json();
 
-        if (!response.ok) {
+        if (!servicesResponse.ok) {
           throw new Error(
-            data.message || "Failed to fetch services"
+            servicesData.message || "Failed to fetch services"
+          );
+        }
+
+        if (!relatedProductsResponse.ok) {
+          throw new Error(
+            relatedProductsData.message ||
+              "Failed to fetch related products"
           );
         }
 
         setServices(
-          Array.isArray(data.services) ? data.services : []
+          Array.isArray(servicesData.services)
+            ? servicesData.services
+            : []
         );
-      } catch (error) {
-        if (error.name !== "AbortError") {
-          console.error("Services fetch error:", error);
-          setError(error.message || "Unable to load services");
+
+        const groupedProducts = (
+          Array.isArray(relatedProductsData.related_products)
+            ? relatedProductsData.related_products
+            : []
+        ).reduce((accumulator, product) => {
+          const serviceId = product.service_id;
+
+          if (!accumulator[serviceId]) {
+            accumulator[serviceId] = [];
+          }
+
+          accumulator[serviceId].push(product);
+          return accumulator;
+        }, {});
+
+        setRelatedProductsByService(groupedProducts);
+      } catch (fetchError) {
+        if (fetchError.name !== "AbortError") {
+          console.error("Services fetch error:", fetchError);
+          setError(fetchError.message || "Unable to load services");
         }
       } finally {
         setLoading(false);
       }
     };
 
-    fetchServices();
+    fetchPageData();
 
     return () => {
       controller.abort();
@@ -177,20 +344,20 @@ export default function Servicespage() {
                 duration: 0.7,
                 ease: "easeOut",
               }}
-              className="text-center mb-16 md:mb-20 lg:mb-24"
+              className="text-center mb-16 md:mb-20 lg:mb-20"
             >
               <h2 className="font-['Space_Grotesk'] font-bold text-[25px] md:text-[36px] lg:text-[40px] text-[#2A2E34] mb-4">
                 From prototype to full-scale production and beyond
               </h2>
 
-              <p className="text-[15px] md:text-[19px] lg:text-[20px] font-['DM_Sans'] text-[#64748B] max-w-[600px] mx-auto leading-relaxed">
+              <p className="text-[15px] md:text-[19px] lg:text-[20px] font-['DM_Sans'] text-[#3E4850] max-w-[600px] mx-auto leading-relaxed">
                 A complete contract-manufacturing offering, backed by service
                 and parts support that keep your operation running.
               </p>
             </motion.div>
 
             {loading && (
-              <p className="text-center text-[16px] font-['DM_Sans'] text-[#64748B]">
+              <p className="text-center text-[16px] font-['DM_Sans'] text-[#3E4850]">
                 Loading services...
               </p>
             )}
@@ -202,7 +369,7 @@ export default function Servicespage() {
             )}
 
             {!loading && !error && services.length === 0 && (
-              <p className="text-center text-[16px] font-['DM_Sans'] text-[#64748B]">
+              <p className="text-center text-[16px] font-['DM_Sans'] text-[#3E4850]">
                 No services available.
               </p>
             )}
@@ -215,6 +382,9 @@ export default function Servicespage() {
                   const serviceNumber = String(
                     index + 1
                   ).padStart(2, "0");
+
+                  const relatedProducts =
+                    relatedProductsByService[service.id] || [];
 
                   return (
                     <motion.div
@@ -235,48 +405,56 @@ export default function Servicespage() {
                         duration: 0.7,
                         ease: "easeOut",
                       }}
-                      className="bg-[#EEF6FD] rounded-[24px] p-6 md:p-10 flex flex-col lg:flex-row gap-8 md:gap-12 items-center"
+                      className="bg-[#EEF6FD] rounded-[24px] p-6 md:p-10 flex flex-col gap-8 md:gap-12"
                     >
-                      {/* Image */}
-                      <div
-                        className={`group w-full lg:w-[45%] h-[240px] md:h-[300px] lg:h-[380px] rounded-[16px] overflow-hidden order-1 ${
-                          imageLeft
-                            ? "lg:order-1"
-                            : "lg:order-2"
-                        }`}
-                      >
-                        <img
-                          src={service.image}
-                          alt={service.title}
-                          className="w-full h-full object-cover transition-transform duration-300 ease-out group-hover:scale-105"
+                      <div className="flex flex-col lg:flex-row gap-8 md:gap-12 items-center">
+                        {/* Image */}
+                        <div
+                          className={`group w-full lg:w-[45%] h-[240px] md:h-[300px] lg:h-[380px] rounded-[16px] overflow-hidden order-1 ${
+                            imageLeft
+                              ? "lg:order-1"
+                              : "lg:order-2"
+                          }`}
+                        >
+                          <img
+                            src={service.image}
+                            alt={service.title}
+                            className="w-full h-full object-cover transition-transform duration-300 ease-out group-hover:scale-105"
+                          />
+                        </div>
+
+                        {/* Text Content */}
+                        <div
+                          className={`w-full lg:w-[55%] h-auto flex flex-col justify-center order-2 ${
+                            imageLeft
+                              ? "lg:order-2"
+                              : "lg:order-1"
+                          }`}
+                        >
+                          <span className="font-['Space_Grotesk'] font-bold text-[40px] md:text-[56px] lg:text-[66px] text-[#ced1d3] leading-none mb-6">
+                            {serviceNumber}
+                          </span>
+
+                          <h3 className="font-['Space_Grotesk'] font-bold text-[22px] md:text-[26px] text-[#2A2E34] mb-4 leading-tight">
+                            {service.title}
+                          </h3>
+
+                          <p className="text-[14px] sm:text-[16px] md:text-[18px] lg:text-[20px] font-['DM_Sans'] text-[#3E4850] leading-relaxed mb-6">
+                            {service.description}
+                          </p>
+
+                          <span className="inline-flex items-center gap-2 text-[14px] font-semibold tracking-[1px] text-[#00B2F9]">
+                            <span className="block w-6 h-[2px] bg-[#00B2F9] flex-shrink-0"></span>
+                            {service.link_text}
+                          </span>
+                        </div>
+                      </div>
+
+                      {relatedProducts.length > 0 && (
+                        <RelatedProductsCarousel
+                          products={relatedProducts}
                         />
-                      </div>
-
-                      {/* Text Content */}
-                      <div
-                        className={`w-full lg:w-[55%] h-auto flex flex-col justify-center order-2 ${
-                          imageLeft
-                            ? "lg:order-2"
-                            : "lg:order-1"
-                        }`}
-                      >
-                        <span className="font-['Space_Grotesk'] font-bold text-[40px] md:text-[56px] lg:text-[66px] text-[#ced1d3] leading-none mb-6">
-                          {serviceNumber}
-                        </span>
-
-                        <h3 className="font-['Space_Grotesk'] font-bold text-[22px] md:text-[26px] text-[#2A2E34] mb-4 leading-tight">
-                          {service.title}
-                        </h3>
-
-                        <p className="text-[14px] sm:text-[16px] md:text-[18px] lg:text-[20px] font-['DM_Sans'] text-[#6B7280] leading-relaxed mb-6">
-                          {service.description}
-                        </p>
-
-                        <span className="inline-flex items-center gap-2 text-[14px] font-semibold tracking-[1px] text-[#00B2F9]">
-  <span className="block w-6 h-[2px] bg-[#00B2F9] flex-shrink-0"></span>
-  {service.link_text}
-</span>
-                      </div>
+                      )}
                     </motion.div>
                   );
                 })}

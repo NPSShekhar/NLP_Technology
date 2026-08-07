@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import logo from "../../assets/nlp_logo.jpg";
 import { ArrowUp } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -6,15 +6,72 @@ import {
   FaLinkedinIn,
   FaTwitter,
   FaYoutube,
+  FaFacebookF,
+  FaInstagram,
 } from "react-icons/fa";
 
+const API_URL =
+  import.meta.env.VITE_API_URL || "http://localhost:5001";
+
+const PLATFORM_ICONS = {
+  linkedin: FaLinkedinIn,
+  twitter: FaTwitter,
+  youtube: FaYoutube,
+  facebook: FaFacebookF,
+  instagram: FaInstagram,
+};
+
+const PLATFORM_LABELS = {
+  linkedin: "LinkedIn",
+  twitter: "Twitter",
+  youtube: "YouTube",
+  facebook: "Facebook",
+  instagram: "Instagram",
+};
+
 const Footer = () => {
+  const [socialLinks, setSocialLinks] = useState([]);
+
   const scrollTop = () => {
     window.scrollTo({
       top: 0,
       behavior: "smooth",
     });
   };
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    const fetchSocialLinks = async () => {
+      try {
+        const response = await fetch(`${API_URL}/api/social-links`, {
+          signal: controller.signal,
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            data.message || "Failed to fetch social links"
+          );
+        }
+
+        setSocialLinks(
+          Array.isArray(data.social_links) ? data.social_links : []
+        );
+      } catch (fetchError) {
+        if (fetchError.name !== "AbortError") {
+          console.error("Footer social links fetch error:", fetchError);
+        }
+      }
+    };
+
+    fetchSocialLinks();
+
+    return () => {
+      controller.abort();
+    };
+  }, []);
 
   return (
     <footer className="bg-[#EEF0F2] text-[#2A2E34] border-t border-[#DFE5EB]">
@@ -30,41 +87,36 @@ const Footer = () => {
               className="h-10 sm:h-12 mb-6 object-contain mix-blend-multiply"
             />
 
-            <p className="font-['DM_Sans'] text-[#626A75] text-[16px] md:text-[18px] lg:text-[20px] leading-7">
+            <p className="font-['DM_Sans'] text-[#2A2E34] text-[16px] md:text-[18px] lg:text-[20px] leading-7">
               Malaysia-based contract manufacturing partner for the semiconductor, electronics and advanced technology sectors.
             </p>
 
-            <div className="flex gap-3 sm:gap-4 mt-6">
-              <a
-                href="https://www.linkedin.com/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-10 h-10 sm:w-11 sm:h-11 rounded-full border border-[#0EA5E9] flex items-center justify-center text-[#0EA5E9] hover:bg-[#0EA5E9] hover:text-white transition-all duration-300"
-                aria-label="LinkedIn"
-              >
-                <FaLinkedinIn size={16} />
-              </a>
+            {socialLinks.length > 0 && (
+              <div className="flex gap-3 sm:gap-4 mt-6">
+                {socialLinks.map((link) => {
+                  const Icon = PLATFORM_ICONS[link.platform];
 
-              <a
-                href="https://twitter.com/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-10 h-10 sm:w-11 sm:h-11 rounded-full border border-[#0EA5E9] flex items-center justify-center text-[#0EA5E9] hover:bg-[#0EA5E9] hover:text-white transition-all duration-300"
-                aria-label="Twitter"
-              >
-                <FaTwitter size={16} />
-              </a>
+                  if (!Icon) {
+                    return null;
+                  }
 
-            <a
-  href="https://www.youtube.com/"
-  target="_blank"
-  rel="noopener noreferrer"
-  className="w-10 h-10 sm:w-11 sm:h-11 rounded-full border border-[#0EA5E9] flex items-center justify-center text-[#0EA5E9] hover:bg-[#0EA5E9] hover:text-white transition-all duration-300"
-  aria-label="YouTube"
->
-  <FaYoutube size={16} />
-</a>
-            </div>
+                  return (
+                    <a
+                      key={link.id}
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-10 h-10 sm:w-11 sm:h-11 rounded-full border border-[#0EA5E9] flex items-center justify-center text-[#0EA5E9] hover:bg-[#0EA5E9] hover:text-white transition-all duration-300"
+                      aria-label={
+                        PLATFORM_LABELS[link.platform] || link.platform
+                      }
+                    >
+                      <Icon size={16} />
+                    </a>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
         <div className="sm:justify-self-start lg:justify-self-center">
@@ -72,7 +124,7 @@ const Footer = () => {
     Quick Links
   </h3>
 
-  <ul className="space-y-3 font-['DM_Sans'] text-[#626A75] text-[16px] md:text-[18px] lg:text-[20px]">
+  <ul className="space-y-3 font-['DM_Sans'] text-[#3E4850] text-[16px] md:text-[18px] lg:text-[20px]">
     <li>
       <Link
         to="/about"
@@ -108,7 +160,7 @@ const Footer = () => {
               Solutions
             </h3>
 
-            <ul className="space-y-3 font-['DM_Sans'] text-[#626A75] text-[16px] md:text-[18px] lg:text-[20px]">
+            <ul className="space-y-3 font-['DM_Sans'] text-[#3E4850] text-[16px] md:text-[18px] lg:text-[20px]">
               <li className="hover:text-[#0EA5E9] transition-colors cursor-default">Contract Manufacturing & ECM</li>
               <li className="hover:text-[#0EA5E9] transition-colors cursor-default">After Sales & Service Support</li>
               <li className="hover:text-[#0EA5E9] transition-colors cursor-default">Spare Parts Support</li>
@@ -121,7 +173,7 @@ const Footer = () => {
       {/* Bottom Bar */}
 <div className="border-t border-[#D9D9D9] mt-8 pt-6 lg:pt-4 flex flex-col lg:flex-row justify-between items-center gap-4">
 
-  <p className="font-['DM_Sans'] text-[#626A75] text-[15px] md:text-[17px] lg:text-[18px] text-center lg:text-left leading-6">
+  <p className="font-['DM_Sans'] text-[#3E4850] text-[15px] md:text-[17px] lg:text-[18px] text-center lg:text-left leading-6">
     © {new Date().getFullYear()} NLP Technology. All rights reserved.{" "}
     <br className="sm:hidden" />
     Powered by{" "}
@@ -136,9 +188,10 @@ const Footer = () => {
     .
   </p>
 
- <p className="w-full lg:w-auto text-center lg:text-right lg:ml-auto font-['DM_Sans'] text-[#626A75] text-[16px] md:text-[17px] lg:text-[18px] leading-8">
-  <span>Privacy Policy</span>
-  <span className="mx-4 md:mx-5 lg:mx-6">Terms &amp; Conditions</span>
+<p className="w-full lg:w-auto flex items-center justify-center lg:justify-end lg:ml-auto gap-3 font-['DM_Sans'] text-[#3E4850] text-[16px] md:text-[17px] lg:text-[18px] leading-8">
+  <Link to="/privacy-policy" className="hover:text-[#0EA5E9] hover:underline transition-colors">Privacy Policy</Link>
+  <span>|</span>
+  <Link to="/terms-and-conditions" className="hover:text-[#0EA5E9] hover:underline transition-colors">Terms &amp; Conditions</Link>
 </p>
   <button
     onClick={scrollTop}

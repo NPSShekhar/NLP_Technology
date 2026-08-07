@@ -37,6 +37,7 @@ const formatService = (req, service) => {
     title: service.title,
     description: service.description,
     image: createImageUrl(req, service.image),
+    sort_order: service.sort_order,
     created_at: service.created_at,
     updated_at: service.updated_at,
   };
@@ -113,10 +114,11 @@ const getAllServices = async (req, res) => {
         title,
         description,
         image,
+        sort_order,
         created_at,
         updated_at
       FROM services
-      ORDER BY id DESC
+      ORDER BY sort_order ASC, id ASC
     `);
 
     const services = result.rows.map((service) =>
@@ -160,6 +162,7 @@ const getServiceById = async (req, res) => {
           title,
           description,
           image,
+          sort_order,
           created_at,
           updated_at
         FROM services
@@ -196,7 +199,7 @@ const createService = async (req, res) => {
   let uploadedImagePath = null;
 
   try {
-    const { link_text, title, description } = req.body;
+    const { link_text, title, description, sort_order } = req.body;
 
     if (req.file) {
       uploadedImagePath = `/uploads/services/${req.file.filename}`;
@@ -236,21 +239,37 @@ const createService = async (req, res) => {
       });
     }
 
+    const parsedSortOrder =
+      sort_order !== undefined && sort_order !== ""
+        ? Number(sort_order)
+        : null;
+
+    const orderResult = await pool.query(
+      "SELECT COALESCE(MAX(sort_order), 0) + 1 AS next_order FROM services"
+    );
+
+    const nextSortOrder =
+      parsedSortOrder !== null && Number.isInteger(parsedSortOrder)
+        ? parsedSortOrder
+        : orderResult.rows[0].next_order;
+
     const result = await pool.query(
       `
         INSERT INTO services (
           link_text,
           title,
           description,
-          image
+          image,
+          sort_order
         )
-        VALUES ($1, $2, $3, $4)
+        VALUES ($1, $2, $3, $4, $5)
         RETURNING
           id,
           link_text,
           title,
           description,
           image,
+          sort_order,
           created_at,
           updated_at
       `,
@@ -259,6 +278,7 @@ const createService = async (req, res) => {
         title.trim(),
         description.trim(),
         uploadedImagePath,
+        nextSortOrder,
       ]
     );
 
@@ -308,7 +328,8 @@ const updateService = async (req, res) => {
           link_text,
           title,
           description,
-          image
+          image,
+          sort_order
         FROM services
         WHERE id = $1
       `,
@@ -329,7 +350,7 @@ const updateService = async (req, res) => {
     }
 
     const existingService = existingResult.rows[0];
-    const { link_text, title, description } = req.body;
+    const { link_text, title, description, sort_order } = req.body;
 
     if (
       link_text !== undefined &&
@@ -395,6 +416,16 @@ const updateService = async (req, res) => {
         ? description.trim()
         : existingService.description;
 
+    const parsedSortOrder =
+      sort_order !== undefined && sort_order !== ""
+        ? Number(sort_order)
+        : existingService.sort_order;
+
+    const updatedSortOrder =
+      Number.isInteger(parsedSortOrder) && parsedSortOrder >= 0
+        ? parsedSortOrder
+        : existingService.sort_order;
+
     const result = await pool.query(
       `
         UPDATE services
@@ -403,14 +434,16 @@ const updateService = async (req, res) => {
           title = $2,
           description = $3,
           image = $4,
+          sort_order = $5,
           updated_at = CURRENT_TIMESTAMP
-        WHERE id = $5
+        WHERE id = $6
         RETURNING
           id,
           link_text,
           title,
           description,
           image,
+          sort_order,
           created_at,
           updated_at
       `,
@@ -419,6 +452,7 @@ const updateService = async (req, res) => {
         updatedTitle,
         updatedDescription,
         newImagePath,
+        updatedSortOrder,
         serviceId,
       ]
     );

@@ -1,7 +1,7 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import Navbar from "../components/Layout/navbar";
 import Footer from "../components/Layout/Footer";
-import { FiMail, FiMapPin } from "react-icons/fi";
+import { FiMapPin } from "react-icons/fi";
 import heroBg from "../assets/contact_herobg.png";
 import contactMap from "../assets/contact-map.png";
 import { useLocation } from "react-router-dom";
@@ -9,6 +9,9 @@ import { useContactEnquiryForm } from "../lib/contactForm";
 import {
   ContactPhoneField,
   ContactPrivacyCheckbox,
+  ContactFileUploader,
+  ContactInlineCaptcha,
+  SuccessPopupModal,
 } from "../components/ContactFormFields";
 import {
   motion,
@@ -60,6 +63,8 @@ export default function Contactpage() {
     handlePhoneCountryChange,
     handlePhoneChange,
     handlePrivacyChange,
+    handleFileChange,
+    handleCaptchaChange,
     handleSubmit,
   } = useContactEnquiryForm();
 
@@ -217,7 +222,7 @@ export default function Contactpage() {
                 Let's build something precise, together
               </h2>
 
-              <p className="text-[15px] md:text-[18px] lg:text-[20px] font-['DM_Sans'] text-[#64748B] max-w-[700px] mx-auto leading-relaxed">
+              <p className="text-[15px] md:text-[18px] lg:text-[20px] font-['DM_Sans'] text-[#3E4850] max-w-[700px] mx-auto leading-relaxed">
                 For inquiries, quotations, or more information about our
                 services, please reach out — we'd love to hear from you.
               </p>
@@ -253,35 +258,20 @@ export default function Contactpage() {
                     },
                   },
                 }}
-                className="bg-[#2A2E34] text-[#FFFFFF] rounded-[16px] p-8 md:p-10 w-full lg:w-[50%] flex flex-col gap-[50px]"
+                className="bg-[#2A2E34] text-[#FFFFFF] rounded-[16px] p-8 md:p-[60px] w-full lg:w-[50%] flex flex-col gap-6"
               >
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-full bg-[#006591] flex items-center justify-center flex-shrink-0 mt-1">
-                    <FiMail className="w-5 h-5" />
-                  </div>
-
-                  <div>
-                    <h3 className="font-medium font-['Space_Grotesk'] text-[15px] md:text-[18px] lg:text-[19px] mb-1">
-                      Email
-                    </h3>
-
-                    <p className="text-[13px] md:text-[16px] lg:text-[17px] font-['DM_Sans'] text-[#FFFFFF]">
-                      enquiry@nlptec.com
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-4 flex-grow">
+                {/* Address block */}
+                <div className="flex items-start gap-4 mt-2">
                   <div className="w-10 h-10 rounded-full bg-[#006591] flex items-center justify-center flex-shrink-0 mt-1">
                     <FiMapPin className="w-5 h-5" />
                   </div>
 
                   <div>
-                    <h3 className="font-medium font-['Space_Grotesk'] text-[15px] md:text-[18px] lg:text-[19px] mb-1">
+                    <h3 className="font-medium font-['Space_Grotesk'] text-[17px] md:text-[20px] lg:text-[26px] mb-2">
                       Address
                     </h3>
 
-                    <p className="text-[12px] md:text-[16px] lg:text-[17px] font-['DM_Sans'] text-[#FFFFFF] leading-relaxed">
+                    <p className="text-[14px] md:text-[19px] lg:text-[22px] font-['DM_Sans'] text-[#FFFFFF] leading-[17px] md:leading-[25px] lg:leading-[30px]">
                       NLP Technology Sdn. Bhd.
                       <br />
                       15, Jalan Pelepas 4/8, Taman
@@ -298,7 +288,9 @@ export default function Contactpage() {
                   onClick={openGoogleMaps}
                   className="
                     w-full
-                    h-[200px]
+                    h-[220px]
+                    md:h-[300px]
+                    lg:h-[520px]
                     rounded-[12px]
                     overflow-hidden
                     cursor-pointer
@@ -306,8 +298,9 @@ export default function Contactpage() {
                     group
                     transition-all
                     duration-300
-                    hover:scale-[1.02]
+                    hover:scale-[1.01]
                     hover:shadow-[0_8px_25px_rgba(0,0,0,0.15)]
+                    mt-auto
                   "
                 >
                   <img
@@ -315,6 +308,37 @@ export default function Contactpage() {
                     alt="NLP Technology Location Map"
                     className="w-full h-full object-cover"
                   />
+                  {/* Company Badge */}
+<div
+  className="
+    absolute
+    top-3
+    left-3
+    flex
+    items-start
+    gap-2
+    bg-white
+    px-3
+    py-3
+    rounded-[8px]
+    shadow-xl
+    shadow-black/15
+    border
+    z-20
+  "
+>
+  <div className="font-['DM_Sans']">
+    <h1 className="text-[#2A2E34] font-semibold text-[10px] md:text-[14px] leading-tight">
+      NLP Technology Sdn. Bhd.
+    </h1>
+
+    <p className="mt-2 text-gray-700 text-[9px] md:text-[12px] leading-relaxed">
+      15, Jalan Pelepas 4/8, Taman <br />
+      Perindustrian Tanjong Pelepas, <br />
+      81550 Gelang Patah, Johor, Malaysia.
+    </p>
+  </div>
+</div>
 
                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-300 flex items-center justify-center">
                     <div className="opacity-0 group-hover:opacity-100 transition-all duration-300 bg-white/90 backdrop-blur-sm rounded-full px-4 py-2 flex items-center gap-2">
@@ -329,7 +353,6 @@ export default function Contactpage() {
                           d="M12 2C8.14 2 5 5.14 5 9C5 14.25 12 22 12 22C12 22 19 14.25 19 9C19 5.14 15.86 2 12 2Z"
                           fill="#FF0000"
                         />
-
                         <circle
                           cx="12"
                           cy="9"
@@ -356,7 +379,6 @@ export default function Contactpage() {
                           strokeLinecap="round"
                           strokeLinejoin="round"
                         />
-
                         <polyline
                           points="15 3 21 3 21 9"
                           stroke="#2A2E34"
@@ -364,7 +386,6 @@ export default function Contactpage() {
                           strokeLinecap="round"
                           strokeLinejoin="round"
                         />
-
                         <line
                           x1="10"
                           y1="14"
@@ -399,237 +420,192 @@ export default function Contactpage() {
                 }}
                 className="w-full lg:w-[50%] h-full flex flex-col justify-center"
               >
-                {submitted ? (
-                  <div className="w-full min-h-[579px] bg-[#FFFFFF] rounded-[10px] px-7 py-7 pt-[70px] shadow-xl text-[#0B1C30] relative overflow-hidden">
-                    <div className="min-h-[380px] text-center flex flex-col items-center justify-center">
-                      <motion.div
-                        initial={{ opacity: 0, scale: 0.85 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 0.5, ease: "easeOut" }}
-                        className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center text-green-500 mb-6"
-                      >
-                        <svg
-                          className="w-8 h-8"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                          strokeWidth="3"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M5 13l4 4L19 7"
-                          />
-                        </svg>
-                      </motion.div>
-
-                      <motion.h3
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5, delay: 0.2 }}
-                        className="font-['Space_Grotesk'] font-bold text-[24px] md:text-[26px] lg:text-[27px] text-[#1E293B]"
-                      >
-                        Request Sent!
-                      </motion.h3>
-
-                      <motion.p
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5, delay: 0.2 }}
-                        className="mt-4 font-['DM_Sans'] text-[14px] md:text-[15px] lg:text-[17px] text-[#64748B] max-w-[320px]"
-                      >
-                        Thank you for reaching out. Our team will
-                        review your details and contact you within one business
-                        day.
-                      </motion.p>
-
-                      <motion.button
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5, delay: 0.35 }}
-                        type="button"
-                        onClick={() => setSubmitted(false)}
-                        className="mt-8 px-6 py-2 border border-[#0EA5E9] text-[#0EA5E9] rounded-md text-[14px] md:text-[15px] lg:text-[16px] font-medium hover:bg-[#0EA5E9] hover:text-white hover:scale-[1.03] transition-all duration-200 font-['DM_Sans']"
-                      >
-                        Submit Another Request
-                      </motion.button>
-                    </div>
-                  </div>
-                ) : (
                 <form
-                  onSubmit={handleSubmit}
-                  className="flex flex-col gap-5 w-full"
-                  noValidate
-                >
-                  {/* Name and Email */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                    <div className="flex flex-col gap-2">
+                    onSubmit={handleSubmit}
+                    className="flex flex-col gap-5 w-full bg-white p-6 rounded-[16px] shadow-sm border border-gray-50"
+                    noValidate
+                  >
+                    {/* Name and Company name */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                      <div className="flex flex-col gap-2">
+                        <label
+                          htmlFor="contact-page-name"
+                          className="text-[17px] md:text-[18px] lg:text-[19px] font-['DM_Sans'] font-medium text-[#2A2E34]"
+                        >
+                          Name <span className="text-red-500">*</span>
+                        </label>
+
+                        <input
+                          type="text"
+                          id="contact-page-name"
+                          name="name"
+                          value={form.name}
+                          onChange={handleChange}
+                          placeholder="Your name"
+                          autoComplete="name"
+                          className={`h-[44px] px-4 font-['DM_Sans'] rounded-[8px] border bg-[#FFFFFF] text-[14px] md:text-[15px] lg:text-[16px] outline-none transition-colors ${
+                            errors.name
+                              ? "border-red-500"
+                              : "border-gray-200 focus:border-[#00B2F9]"
+                          }`}
+                        />
+
+                        {errors.name && (
+                          <span className="text-red-500 text-[11px] font-['DM_Sans']">
+                            {errors.name}
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="flex flex-col gap-2">
+                        <label
+                          htmlFor="contact-page-address"
+                          className="text-[17px] md:text-[18px] lg:text-[19px] font-['DM_Sans'] font-medium text-[#2A2E34]"
+                        >
+                          Company name <span className="text-red-500">*</span>
+                        </label>
+
+                        <input
+                          type="text"
+                          id="contact-page-address"
+                          name="address"
+                          value={form.address}
+                          onChange={handleChange}
+                          placeholder="Your company name"
+                          autoComplete="organization"
+                          className={`h-[44px] px-4 font-['DM_Sans'] rounded-[8px] border bg-[#FFFFFF] text-[14px] md:text-[15px] lg:text-[16px] outline-none transition-colors ${
+                            errors.address
+                              ? "border-red-500"
+                              : "border-gray-200 focus:border-[#00B2F9]"
+                          }`}
+                        />
+
+                        {errors.address && (
+                          <span className="text-red-500 text-[11px] font-['DM_Sans']">
+                            {errors.address}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Phone and Email */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                      <ContactPhoneField
+                        idPrefix="contact-page"
+                        form={form}
+                        errors={errors}
+                        onCountryChange={handlePhoneCountryChange}
+                        onPhoneChange={handlePhoneChange}
+                        selectClassName="pl-3 pr-9 rounded-[8px]"
+                        inputClassName="rounded-[8px]"
+                      />
+
+                      <div className="flex flex-col gap-2">
+                        <label
+                          htmlFor="contact-page-email"
+                          className="text-[17px] md:text-[18px] lg:text-[19px] font-['DM_Sans'] font-medium text-[#2A2E34]"
+                        >
+                          Email <span className="text-red-500">*</span>
+                        </label>
+
+                        <input
+                          type="email"
+                          id="contact-page-email"
+                          name="email"
+                          value={form.email}
+                          onChange={handleChange}
+                          placeholder="Your email address"
+                          autoComplete="email"
+                          className={`h-[44px] px-4 font-['DM_Sans'] rounded-[8px] border bg-[#FFFFFF] text-[14px] md:text-[15px] lg:text-[16px] outline-none transition-colors ${
+                            errors.email
+                              ? "border-red-500"
+                              : "border-gray-200 focus:border-[#00B2F9]"
+                          }`}
+                        />
+
+                        {errors.email && (
+                          <span className="text-red-500 text-[11px] font-['DM_Sans']">
+                            {errors.email}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Upload File */}
+                    <ContactFileUploader
+                      form={form}
+                      errors={errors}
+                      onFileChange={handleFileChange}
+                    />
+
+                    {/* Message */}
+                    <div className="flex flex-col gap-2 w-full">
                       <label
-                        htmlFor="contact-page-name"
+                        htmlFor="contact-page-message"
                         className="text-[17px] md:text-[18px] lg:text-[19px] font-['DM_Sans'] font-medium text-[#2A2E34]"
                       >
-                        Name{" "}
-                        <span className="text-red-500">*</span>
+                        Message/ Enquiry <span className="text-red-500">*</span>
                       </label>
 
-                      <input
-                        type="text"
-                        id="contact-page-name"
-                        name="name"
-                        value={form.name}
+                      <textarea
+                        id="contact-page-message"
+                        name="message"
+                        value={form.message}
                         onChange={handleChange}
-                        placeholder="Your name"
-                        autoComplete="name"
-                        className={`h-[44px] px-4 font-['DM_Sans'] rounded-[8px] border bg-[#FFFFFF] text-[14px] md:text-[15px] lg:text-[16px] outline-none transition-colors ${
-                          errors.name
+                        placeholder="Tell us about your requirements (up to 600 words)"
+                        rows="6"
+                        className={`px-4 py-3 font-['DM_Sans'] rounded-[8px] border bg-[#FFFFFF] text-[14px] md:text-[15px] lg:text-[16px] outline-none transition-colors resize-none ${
+                          errors.message
                             ? "border-red-500"
                             : "border-gray-200 focus:border-[#00B2F9]"
                         }`}
                       />
 
-                      {errors.name && (
+                      {errors.message && (
                         <span className="text-red-500 text-[11px] font-['DM_Sans']">
-                          {errors.name}
+                          {errors.message}
                         </span>
                       )}
                     </div>
 
-                    <div className="flex flex-col gap-2">
-                      <label
-                        htmlFor="contact-page-email"
-                        className="text-[17px] md:text-[18px] lg:text-[19px] font-['DM_Sans'] font-medium text-[#2A2E34]"
-                      >
-                        Email{" "}
-                        <span className="text-red-500">*</span>
-                      </label>
+                    {/* Inline CAPTCHA */}
+                    <ContactInlineCaptcha
+                      onVerify={handleCaptchaChange}
+                      captchaVerified={form.captchaVerified}
+                      errors={errors}
+                    />
 
-                      <input
-                        type="email"
-                        id="contact-page-email"
-                        name="email"
-                        value={form.email}
-                        onChange={handleChange}
-                        placeholder="Your email address"
-                        autoComplete="email"
-                        className={`h-[44px] px-4 font-['DM_Sans'] rounded-[8px] border bg-[#FFFFFF] text-[14px] md:text-[15px] lg:text-[16px] outline-none transition-colors ${
-                          errors.email
-                            ? "border-red-500"
-                            : "border-gray-200 focus:border-[#00B2F9]"
-                        }`}
-                      />
-
-                      {errors.email && (
-                        <span className="text-red-500 text-[11px] font-['DM_Sans']">
-                          {errors.email}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Phone and Address */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                    <ContactPhoneField
+                    {/* Privacy policy checkbox */}
+                    <ContactPrivacyCheckbox
                       idPrefix="contact-page"
                       form={form}
                       errors={errors}
-                      onCountryChange={handlePhoneCountryChange}
-                      onPhoneChange={handlePhoneChange}
-                      selectClassName="pl-3 pr-9 rounded-[8px]"
-                      inputClassName="rounded-[8px]"
+                      onChange={handlePrivacyChange}
                     />
 
-                    <div className="flex flex-col gap-2">
-                      <label
-                        htmlFor="contact-page-address"
-                        className="text-[17px] md:text-[18px] lg:text-[19px] font-['DM_Sans'] font-medium text-[#2A2E34]"
-                      >
-                        Address{" "}
-                        <span className="text-red-500">*</span>
-                      </label>
+                    {submitError && (
+                      <p className="rounded-[8px] bg-red-50 px-4 py-3 font-['DM_Sans'] text-[14px] text-red-600">
+                        {submitError}
+                      </p>
+                    )}
 
-                      <input
-                        type="text"
-                        id="contact-page-address"
-                        name="address"
-                        value={form.address}
-                        onChange={handleChange}
-                        placeholder="Your company address"
-                        autoComplete="street-address"
-                        className={`h-[44px] px-4 font-['DM_Sans'] rounded-[8px] border bg-[#FFFFFF] text-[14px] md:text-[15px] lg:text-[16px] outline-none transition-colors ${
-                          errors.address
-                            ? "border-red-500"
-                            : "border-gray-200 focus:border-[#00B2F9]"
-                        }`}
-                      />
-
-                      {errors.address && (
-                        <span className="text-red-500 text-[11px] font-['DM_Sans']">
-                          {errors.address}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Message */}
-                  <div className="flex flex-col gap-2 w-full">
-                    <label
-                      htmlFor="contact-page-message"
-                      className="text-[17px] md:text-[18px] lg:text-[19px] font-['DM_Sans'] font-medium text-[#2A2E34]"
+                    <button
+                      type="submit"
+                      disabled={submitting}
+                      className="mt-3 w-full h-[54px] bg-[#00B2F9] hover:bg-[#0EA5E9] text-[#FFFFFF] rounded-[15px] font-medium font-['DM_Sans'] text-[17px] md:text-[18px] lg:text-[19px] flex items-center justify-center gap-2 hover:scale-[1.04] transition-all duration-300 ease-out active:scale-95 shadow-md disabled:cursor-not-allowed disabled:opacity-60"
                     >
-                      Message/ Enquiry{" "}
-                      <span className="text-red-500">*</span>
-                    </label>
+                      {submitting ? "Sending..." : "Send enquiry"}
 
-                    <textarea
-                      id="contact-page-message"
-                      name="message"
-                      value={form.message}
-                      onChange={handleChange}
-                      placeholder="Tell us about your requirements (up to 600 words)"
-                      rows="8"
-                      className={`px-4 py-3 font-['DM_Sans'] rounded-[8px] border bg-[#FFFFFF] text-[14px] md:text-[15px] lg:text-[16px] outline-none transition-colors resize-none ${
-                        errors.message
-                          ? "border-red-500"
-                          : "border-gray-200 focus:border-[#00B2F9]"
-                      }`}
-                    />
-
-                    {errors.message && (
-                      <span className="text-red-500 text-[11px] font-['DM_Sans']">
-                        {errors.message}
-                      </span>
-                    )}
-                  </div>
-
-                  <ContactPrivacyCheckbox
-                    idPrefix="contact-page"
-                    form={form}
-                    errors={errors}
-                    onChange={handlePrivacyChange}
-                  />
-
-                  {submitError && (
-                    <p className="rounded-[8px] bg-red-50 px-4 py-3 font-['DM_Sans'] text-[14px] text-red-600">
-                      {submitError}
-                    </p>
-                  )}
-
-
-                  <button
-                    type="submit"
-                    disabled={submitting}
-                    className="mt-3 w-full h-[54px] bg-[#00B2F9] hover:bg-[#0EA5E9] text-[#FFFFFF] rounded-[8px] font-medium font-['DM_Sans'] text-[17px] md:text-[18px] lg:text-[19px] flex items-center justify-center gap-2 hover:scale-[1.04] transition-all duration-300 ease-out active:scale-95 shadow-md disabled:cursor-not-allowed disabled:opacity-60"
-                  >
-                    {submitting
-                      ? "Sending..."
-                      : "Send enquiry"}
-
-                    {!submitting && (
-                      <SendArrowIcon className="w-4 h-4 text-[#FFFFFF]" />
-                    )}
-                  </button>
-                </form>
-                )}
+                      {!submitting && (
+                        <SendArrowIcon className="w-4 h-4 text-[#FFFFFF]" />
+                      )}
+                    </button>
+                  </form>
+                
+                <SuccessPopupModal 
+                  isOpen={submitted} 
+                  onClose={() => setSubmitted(false)} 
+                />
               </motion.div>
             </motion.div>
           </div>
@@ -637,6 +613,7 @@ export default function Contactpage() {
       </main>
 
       <Footer />
+
     </div>
   );
 }

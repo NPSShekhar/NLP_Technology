@@ -91,7 +91,7 @@ export default function PopupImageCropper({
           <h3 className="font-['Space_Grotesk'] text-[22px] font-bold text-[#2A2E34]">
             Crop banner
           </h3>
-          <p className="mt-1 font-['DM_Sans'] text-[14px] text-[#64748B]">
+          <p className="mt-1 font-['DM_Sans'] text-[14px] md:text-[16px] text-[#64748B]">
             Drag the crop box or resize from corners and edges to select
             the area you want.
           </p>
@@ -127,7 +127,7 @@ export default function PopupImageCropper({
             <button
               type="button"
               onClick={onCancel}
-              className="inline-flex h-[46px] flex-1 items-center justify-center rounded-[12px] bg-[#FFFFFF] px-6 font-['DM_Sans'] text-[15px] font-semibold text-[#2A2E34] transition hover:bg-[#EEF6FD]"
+              className="inline-flex h-[46px] flex-1 items-center justify-center border rounded-[12px] bg-[#FFFFFF] px-6 font-['DM_Sans'] text-[15px] md:text-[17px] font-semibold text-[#2A2E34] transition hover:bg-[#EEF6FD]"
             >
               Cancel
             </button>
@@ -140,9 +140,9 @@ export default function PopupImageCropper({
                 !completedCrop?.width ||
                 !completedCrop?.height
               }
-              className="inline-flex h-[46px] flex-1 items-center justify-center rounded-[12px] bg-[#00B2F9] px-6 font-['DM_Sans'] text-[15px] font-semibold text-white transition hover:bg-[#0EA5E9] disabled:cursor-not-allowed disabled:opacity-60"
+              className="inline-flex h-[46px] flex-1 items-center justify-center rounded-[12px] bg-[#00B2F9] px-6 font-['DM_Sans'] text-[15px] md:text-[17px] font-semibold text-white transition hover:bg-[#0EA5E9] disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {processing ? "Applying..." : "Apply crop"}
+              {processing ? "Applying..." : "Apply"}
             </button>
           </div>
         </div>

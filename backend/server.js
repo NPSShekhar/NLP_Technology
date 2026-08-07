@@ -5,10 +5,13 @@ const multer = require("multer");
 require("dotenv").config();
 
 const pool = require("./config/db");
+const runMigrations = require("./utils/runMigrations");
 const serviceRoutes = require("./routes/serviceRoutes");
 const teamRoutes = require("./routes/teamRoutes");
 const contactRoutes = require("./routes/contactRoutes");
 const popupRoutes = require("./routes/popupRoutes");
+const relatedProductRoutes = require("./routes/relatedProductRoutes");
+const socialLinkRoutes = require("./routes/socialLinkRoutes");
 
 const app = express();
 
@@ -72,6 +75,8 @@ app.use(
 );
 
 app.use("/api/popup", popupRoutes);
+app.use("/api/related-products", relatedProductRoutes);
+app.use("/api/social-links", socialLinkRoutes);
 
 // Route not found
 app.use((req, res) => {
@@ -133,6 +138,7 @@ app.use((error, req, res, next) => {
 const startServer = async () => {
   try {
     await pool.query("SELECT NOW()");
+    await runMigrations();
 
     app.listen(PORT, () => {
       console.log(`Server running at http://localhost:${PORT}`);
