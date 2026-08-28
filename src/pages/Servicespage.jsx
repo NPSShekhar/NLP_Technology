@@ -193,8 +193,9 @@ export default function Servicespage() {
         setLoading(true);
         setError("");
 
-        const apiUrl =
-          import.meta.env.VITE_API_URL || "http://localhost:5001";
+     const apiUrl =
+  import.meta.env.VITE_API_URL ||
+  window.location.origin;
 
         const [servicesResponse, relatedProductsResponse] =
           await Promise.all([

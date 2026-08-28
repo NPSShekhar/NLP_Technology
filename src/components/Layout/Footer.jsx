@@ -29,6 +29,14 @@ const PLATFORM_LABELS = {
   instagram: "Instagram",
 };
 
+const PLATFORM_CLASSES = {
+  linkedin: "text-[#0EA5E9] hover:bg-[#0EA5E9]",
+  twitter: " text-[#1DA1F2] hover:bg-[#0EA5E9]",
+  youtube: " text-[#FF0000] hover:bg-[#0EA5E9]",
+  facebook: " text-[#1877F2] hover:bg-[#0EA5E9]",
+  instagram: "text-[#E4405F] hover:bg-[#0EA5E9]",
+};
+
 const Footer = () => {
   const [socialLinks, setSocialLinks] = useState([]);
 
@@ -106,12 +114,14 @@ const Footer = () => {
                       href={link.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-10 h-10 sm:w-11 sm:h-11 rounded-full border border-[#0EA5E9] flex items-center justify-center text-[#0EA5E9] hover:bg-[#0EA5E9] hover:text-white transition-all duration-300"
+                      className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#FFFFFF] flex items-center justify-center shadow-xl  hover:text-white transition-all duration-300 ${
+                        PLATFORM_CLASSES[link.platform] || "border-[#0EA5E9] text-[#0EA5E9] hover:bg-[#0EA5E9]"
+                      }`}
                       aria-label={
                         PLATFORM_LABELS[link.platform] || link.platform
                       }
                     >
-                      <Icon size={16} />
+                      <Icon size={18} />
                     </a>
                   );
                 })}
@@ -171,21 +181,21 @@ const Footer = () => {
         </div>
 
       {/* Bottom Bar */}
-<div className="border-t border-[#D9D9D9] mt-8 pt-6 lg:pt-4 flex flex-col lg:flex-row justify-between items-center gap-4">
+<div className="border-t border-[#D9D9D9] mt-8 pt-6 lg:pt-4 flex flex-col lg:flex-row justify-between items-center gap-8">
 
   <p className="font-['DM_Sans'] text-[#3E4850] text-[15px] md:text-[17px] lg:text-[18px] text-center lg:text-left leading-6">
     © {new Date().getFullYear()} NLP Technology. All rights reserved.{" "}
     <br className="sm:hidden" />
     Powered by{" "}
     <a
-      href="https://netopsys.in/"
+      href="https://netopsys.net"
       target="_blank"
       rel="noopener noreferrer"
       className="text-[#FF5A4E] hover:underline font-medium"
     >
-      Netopsys AI Private Limited
+      Netopsys Pte. Ltd, Singapore.
     </a>
-    .
+    
   </p>
 
 <p className="w-full lg:w-auto flex items-center justify-center lg:justify-end lg:ml-auto gap-3 font-['DM_Sans'] text-[#3E4850] text-[16px] md:text-[17px] lg:text-[18px] leading-8">

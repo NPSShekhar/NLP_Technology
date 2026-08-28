@@ -713,7 +713,7 @@ function ServicesManager() {
 
           <div>
             <label className="mb-2 block font-['DM_Sans'] text-[14px] md:text-[16px] font-semibold text-[#2A2E34]">
-              Description
+              Description <span className="text-red-500">*</span>
             </label>
 
             <textarea
@@ -745,7 +745,7 @@ function ServicesManager() {
 
           <div>
             <label className="mb-2 block font-['DM_Sans'] text-[14px] md:text-[16px] font-semibold text-[#2A2E34]">
-              Image
+              Image <span className="text-red-500">*</span>
             </label>
 
             <input
@@ -819,7 +819,7 @@ function ServicesManager() {
         >
        <div>
   <label className="mb-2 block font-['DM_Sans'] text-[14px] md:text-[16px] font-semibold text-[#2A2E34]">
-    Services Category
+    Services Category <span className="text-red-500">*</span>
   </label>
 
 <Select
@@ -895,7 +895,7 @@ function ServicesManager() {
 
           <div>
             <label className="mb-2 block font-['DM_Sans'] text-[14px] md:text-[16px] font-semibold text-[#2A2E34]">
-              Description
+              Description <span className="text-red-500">*</span>
             </label>
 
             <textarea
@@ -910,7 +910,7 @@ function ServicesManager() {
 
           <div>
             <label className="mb-2 block font-['DM_Sans'] text-[14px] md:text-[16px] font-semibold text-[#2A2E34]">
-              Image
+              Image <span className="text-red-500">*</span>
             </label>
 
             <input
@@ -1497,7 +1497,7 @@ function SocialLinksManager() {
         >
        <div>
   <label className="mb-2 block font-['DM_Sans'] text-[14px] md:text-[16px] font-semibold text-[#2A2E34]">
-    Platform
+    Platform <span className="text-red-500">*</span>
   </label>
 
   <Select
@@ -2031,7 +2031,7 @@ function PopupBannerManager() {
           >
             <div>
               <label className="mb-2 block font-['DM_Sans'] text-[14px] md:text-[16px] font-semibold text-[#2A2E34]">
-                Image
+                Image <span className="text-red-500">*</span>
               </label>
 
               <input
@@ -2236,7 +2236,7 @@ function FormField({
   return (
     <div>
       <label className="mb-2 block font-['DM_Sans'] text-[14px] md:text-[16px] font-semibold text-[#2A2E34]">
-        {label}
+        {label} {label !== "Order" && <span className="text-red-500">*</span>}
       </label>
 
       <input

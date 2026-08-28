@@ -13,6 +13,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsConditions from "./pages/TermsConditions";
 import ContentPage from "./Adminpages/ContentPage";
 import PopupBanner from "./components/PopupBanner";
+import ContentProtection from "./components/ContentProtection";
 
 function ScrollToTop() {
   const { pathname, hash, state } = useLocation();
@@ -33,10 +34,17 @@ function ScrollToTop() {
 function App() {
   const { pathname } = useLocation();
 
+  const isAdminPage = pathname === "/admin";
+
   return (
     <>
       <ScrollToTop />
-      {pathname !== "/admin" && <PopupBanner />}
+
+      {/* Content protection for public website only */}
+      {!isAdminPage && <ContentProtection />}
+
+      {/* Popup banner for public website only */}
+      {!isAdminPage && <PopupBanner />}
 
       <Routes>
         <Route path="/" element={<Home />} />
@@ -45,6 +53,8 @@ function App() {
         <Route path="/contact" element={<Contactpage />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/terms-and-conditions" element={<TermsConditions />} />
+
+        {/* Admin page */}
         <Route
           path="/admin"
           element={<ContentPage />}
