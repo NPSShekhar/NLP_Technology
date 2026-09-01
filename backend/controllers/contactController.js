@@ -18,29 +18,40 @@ const escapeHtml = (value = "") => {
  * POST /api/contact-enquiries
  */
 const createContactEnquiry = async (req, res) => {
-  const validation = validateContactPayload(req.body);
-
-  if (!validation.isValid) {
-    return res.status(400).json({
-      success: false,
-      message: "Please correct the form errors.",
-      errors: validation.errors,
-    });
-  }
-
-  const {
-    name,
-    email,
-    phone,
-    address,
-    message,
-  } = validation.data;
-
-  const client = await pool.connect();
+  let client;
 
   try {
+    // ----------------------------------------
+    // 1. Validate request
+    // ----------------------------------------
+    const validation = validateContactPayload(req.body);
+
+    if (!validation.isValid) {
+      return res.status(400).json({
+        success: false,
+        message: "Please correct the form errors.",
+        errors: validation.errors,
+      });
+    }
+
+    const {
+      name,
+      email,
+      phone,
+      address,
+      message,
+    } = validation.data;
+
+    // ----------------------------------------
+    // 2. Get database connection
+    // ----------------------------------------
+    client = await pool.connect();
+
     await client.query("BEGIN");
 
+    // ----------------------------------------
+    // 3. Save enquiry to database
+    // ----------------------------------------
     const insertResult = await client.query(
       `
         INSERT INTO contact_enquiries (
@@ -73,10 +84,25 @@ const createContactEnquiry = async (req, res) => {
 
     const enquiry = insertResult.rows[0];
 
+    // ----------------------------------------
+    // 4. Check required mail configuration
+    // ----------------------------------------
+    if (!process.env.MAIL_FROM) {
+      throw new Error("MAIL_FROM is not configured.");
+    }
+
+    if (!process.env.ADMIN_EMAIL) {
+      throw new Error("ADMIN_EMAIL is not configured.");
+    }
+
+    // ----------------------------------------
+    // 5. Prepare email
+    // ----------------------------------------
     const mailOptions = {
       from: process.env.MAIL_FROM,
       to: process.env.ADMIN_EMAIL,
       replyTo: email,
+
       subject: `New enquiry from ${name}`,
 
       text: `
@@ -92,7 +118,13 @@ ${message}
       `.trim(),
 
       html: `
-        <div style="font-family: Arial, sans-serif; color: #222;">
+        <div
+          style="
+            font-family: Arial, sans-serif;
+            color: #222;
+            line-height: 1.6;
+          "
+        >
           <h2 style="color: #00A7E8;">
             New Enquiry
           </h2>
@@ -128,17 +160,45 @@ ${message}
       `,
     };
 
+    // ----------------------------------------
+    // 6. Add uploaded file if available
+    // ----------------------------------------
     if (req.file) {
-      mailOptions.attachments = [
-        {
-          filename: req.file.originalname,
-          content: req.file.buffer,
-        },
-      ];
+      if (req.file.buffer) {
+        // Memory storage
+        mailOptions.attachments = [
+          {
+            filename: req.file.originalname,
+            content: req.file.buffer,
+          },
+        ];
+      } else if (req.file.path) {
+        // Disk storage
+        mailOptions.attachments = [
+          {
+            filename: req.file.originalname,
+            path: req.file.path,
+          },
+        ];
+      }
     }
+
+    // ----------------------------------------
+    // 7. Send email
+    // ----------------------------------------
+    console.log("Sending contact enquiry email...");
+    console.log("MAIL_FROM:", process.env.MAIL_FROM);
+    console.log("ADMIN_EMAIL:", process.env.ADMIN_EMAIL);
+    console.log("Reply-To:", email);
+    console.log("Attachment:", req.file ? req.file.originalname : "None");
 
     await transporter.sendMail(mailOptions);
 
+    console.log("Contact enquiry email sent successfully.");
+
+    // ----------------------------------------
+    // 8. Mark email as sent
+    // ----------------------------------------
     const updateResult = await client.query(
       `
         UPDATE contact_enquiries
@@ -160,6 +220,9 @@ ${message}
       [enquiry.id]
     );
 
+    // ----------------------------------------
+    // 9. Commit transaction
+    // ----------------------------------------
     await client.query("COMMIT");
 
     return res.status(201).json({
@@ -168,12 +231,32 @@ ${message}
       enquiry: updateResult.rows[0],
     });
   } catch (error) {
-    await client.query("ROLLBACK");
+    // ----------------------------------------
+    // Rollback transaction
+    // ----------------------------------------
+    if (client) {
+      try {
+        await client.query("ROLLBACK");
+      } catch (rollbackError) {
+        console.error(
+          "Rollback error:",
+          rollbackError.message
+        );
+      }
+    }
 
+    // ----------------------------------------
+    // Log complete error
+    // ----------------------------------------
     console.error(
-      "Contact enquiry submission error:",
-      error
+      "Contact enquiry submission error:"
     );
+
+    console.error("Message:", error.message);
+    console.error("Name:", error.name);
+    console.error("Code:", error.code);
+    console.error("Command:", error.command);
+    console.error("Response:", error.response);
 
     return res.status(500).json({
       success: false,
@@ -181,7 +264,12 @@ ${message}
         "Unable to submit your enquiry. Please try again.",
     });
   } finally {
-    client.release();
+    // ----------------------------------------
+    // Release database connection
+    // ----------------------------------------
+    if (client) {
+      client.release();
+    }
   }
 };
 

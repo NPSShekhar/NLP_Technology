@@ -3,20 +3,61 @@ const path = require("path");
 const pool = require("../config/db");
 
 /**
- * Convert stored image path into complete image URL.
+ * Convert stored image path into complete public image URL.
  *
- * Stored value:
- * /uploads/services/example.jpg
+ * Database can contain:
+ *   /uploads/services/example.jpg
+ *   http://nlptech.netopsys.in/uploads/services/example.jpg
+ *   https://nlptech.netopsys.in/uploads/services/example.jpg
  *
- * Returned value:
- * http://localhost:5001/uploads/services/example.jpg
+ * Public URL will be:
+ *   https://nlptech.netopsys.in/api/uploads/services/example.jpg
  */
 const createImageUrl = (req, imagePath) => {
   if (!imagePath) {
     return null;
   }
 
-  // Return external URLs without changing them
+  const API_UPLOAD_PREFIX = "/api/uploads";
+
+  /*
+   * Handle old/full NLP Technology URLs.
+   *
+   * Old:
+   * https://nlptech.netopsys.in/uploads/services/example.jpg
+   *
+   * New:
+   * https://nlptech.netopsys.in/api/uploads/services/example.jpg
+   */
+  if (
+    imagePath.startsWith(
+      "http://nlptech.netopsys.in"
+    ) ||
+    imagePath.startsWith(
+      "https://nlptech.netopsys.in"
+    )
+  ) {
+    const pathPart = imagePath.replace(
+      /^https?:\/\/nlptech\.netopsys\.in/,
+      ""
+    );
+
+    if (pathPart.startsWith("/api/uploads/")) {
+      return `https://nlptech.netopsys.in${pathPart}`;
+    }
+
+    if (pathPart.startsWith("/uploads/")) {
+      return `https://nlptech.netopsys.in${API_UPLOAD_PREFIX}${pathPart.substring(
+        "/uploads".length
+      )}`;
+    }
+
+    return `https://nlptech.netopsys.in${pathPart}`;
+  }
+
+  /*
+   * Keep other external URLs unchanged.
+   */
   if (
     imagePath.startsWith("http://") ||
     imagePath.startsWith("https://")
@@ -24,7 +65,51 @@ const createImageUrl = (req, imagePath) => {
     return imagePath;
   }
 
-  return `${req.protocol}://${req.get("host")}${imagePath}`;
+  /*
+   * If database already contains:
+   * /api/uploads/...
+   */
+  if (imagePath.startsWith("/api/uploads/")) {
+    return `https://nlptech.netopsys.in${imagePath}`;
+  }
+
+  /*
+   * Normal database value:
+   * /uploads/services/example.jpg
+   *
+   * Convert to:
+   * https://nlptech.netopsys.in/api/uploads/services/example.jpg
+   */
+  if (imagePath.startsWith("/uploads/")) {
+    return `https://nlptech.netopsys.in${API_UPLOAD_PREFIX}${imagePath.substring(
+      "/uploads".length
+    )}`;
+  }
+
+  /*
+   * Handle values without leading slash.
+   *
+   * Example:
+   * uploads/services/example.jpg
+   */
+  if (imagePath.startsWith("uploads/")) {
+    return `https://nlptech.netopsys.in${API_UPLOAD_PREFIX}/${imagePath.substring(
+      "uploads/".length
+    )}`;
+  }
+
+  /*
+   * Fallback.
+   */
+  const protocol =
+    process.env.NODE_ENV === "production"
+      ? "https"
+      : req.protocol;
+
+  return `${protocol}://${req.get("host")}/${imagePath.replace(
+    /^[/\\]+/,
+    ""
+  )}`;
 };
 
 /**
@@ -52,6 +137,45 @@ const removeImageFile = async (imagePath) => {
       return;
     }
 
+    /*
+     * Convert public URLs back to their stored relative path.
+     *
+     * Example:
+     * https://nlptech.netopsys.in/api/uploads/services/a.png
+     *
+     * becomes:
+     * /uploads/services/a.png
+     */
+    if (
+      imagePath.startsWith("http://nlptech.netopsys.in") ||
+      imagePath.startsWith("https://nlptech.netopsys.in")
+    ) {
+      imagePath = imagePath.replace(
+        /^https?:\/\/nlptech\.netopsys\.in/,
+        ""
+      );
+
+      if (imagePath.startsWith("/api/uploads/")) {
+        imagePath = imagePath.replace(
+          "/api/uploads/",
+          "/uploads/"
+        );
+      }
+    }
+
+    /*
+     * Handle /api/uploads/... paths.
+     */
+    if (imagePath.startsWith("/api/uploads/")) {
+      imagePath = imagePath.replace(
+        "/api/uploads/",
+        "/uploads/"
+      );
+    }
+
+    /*
+     * Ignore other external URLs.
+     */
     if (
       imagePath.startsWith("http://") ||
       imagePath.startsWith("https://")
@@ -60,19 +184,30 @@ const removeImageFile = async (imagePath) => {
     }
 
     const projectRoot = path.resolve(__dirname, "..");
-    const uploadsRoot = path.resolve(projectRoot, "uploads");
+    const uploadsRoot = path.resolve(
+      projectRoot,
+      "uploads"
+    );
 
-    const normalizedImagePath = imagePath.replace(/^[/\\]+/, "");
+    const normalizedImagePath = imagePath.replace(
+      /^[/\\]+/,
+      ""
+    );
 
     const absoluteImagePath = path.resolve(
       projectRoot,
       normalizedImagePath
     );
 
-    // Prevent deleting files outside uploads directory
+    /*
+     * Security:
+     * Never delete files outside uploads directory.
+     */
     if (
       absoluteImagePath !== uploadsRoot &&
-      !absoluteImagePath.startsWith(`${uploadsRoot}${path.sep}`)
+      !absoluteImagePath.startsWith(
+        `${uploadsRoot}${path.sep}`
+      )
     ) {
       console.error(
         "Invalid image deletion path:",
@@ -84,7 +219,10 @@ const removeImageFile = async (imagePath) => {
     await fs.promises.unlink(absoluteImagePath);
   } catch (error) {
     if (error.code !== "ENOENT") {
-      console.error("Failed to delete image:", error);
+      console.error(
+        "Failed to delete image:",
+        error
+      );
     }
   }
 };
@@ -95,7 +233,10 @@ const removeImageFile = async (imagePath) => {
 const validateServiceId = (id) => {
   const numericId = Number(id);
 
-  if (!Number.isInteger(numericId) || numericId <= 0) {
+  if (
+    !Number.isInteger(numericId) ||
+    numericId <= 0
+  ) {
     return null;
   }
 
@@ -131,7 +272,10 @@ const getAllServices = async (req, res) => {
       services,
     });
   } catch (error) {
-    console.error("Get services error:", error);
+    console.error(
+      "Get services error:",
+      error
+    );
 
     return res.status(500).json({
       success: false,
@@ -145,7 +289,9 @@ const getAllServices = async (req, res) => {
  */
 const getServiceById = async (req, res) => {
   try {
-    const serviceId = validateServiceId(req.params.id);
+    const serviceId = validateServiceId(
+      req.params.id
+    );
 
     if (!serviceId) {
       return res.status(400).json({
@@ -180,10 +326,16 @@ const getServiceById = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      service: formatService(req, result.rows[0]),
+      service: formatService(
+        req,
+        result.rows[0]
+      ),
     });
   } catch (error) {
-    console.error("Get service error:", error);
+    console.error(
+      "Get service error:",
+      error
+    );
 
     return res.status(500).json({
       success: false,
@@ -199,14 +351,21 @@ const createService = async (req, res) => {
   let uploadedImagePath = null;
 
   try {
-    const { link_text, title, description, sort_order } = req.body;
+    const {
+      link_text,
+      title,
+      description,
+      sort_order,
+    } = req.body;
 
     if (req.file) {
       uploadedImagePath = `/uploads/services/${req.file.filename}`;
     }
 
     if (!link_text || !link_text.trim()) {
-      await removeImageFile(uploadedImagePath);
+      await removeImageFile(
+        uploadedImagePath
+      );
 
       return res.status(400).json({
         success: false,
@@ -215,7 +374,9 @@ const createService = async (req, res) => {
     }
 
     if (!title || !title.trim()) {
-      await removeImageFile(uploadedImagePath);
+      await removeImageFile(
+        uploadedImagePath
+      );
 
       return res.status(400).json({
         success: false,
@@ -223,12 +384,18 @@ const createService = async (req, res) => {
       });
     }
 
-    if (!description || !description.trim()) {
-      await removeImageFile(uploadedImagePath);
+    if (
+      !description ||
+      !description.trim()
+    ) {
+      await removeImageFile(
+        uploadedImagePath
+      );
 
       return res.status(400).json({
         success: false,
-        message: "Service description is required.",
+        message:
+          "Service description is required.",
       });
     }
 
@@ -240,16 +407,23 @@ const createService = async (req, res) => {
     }
 
     const parsedSortOrder =
-      sort_order !== undefined && sort_order !== ""
+      sort_order !== undefined &&
+      sort_order !== ""
         ? Number(sort_order)
         : null;
 
     const orderResult = await pool.query(
-      "SELECT COALESCE(MAX(sort_order), 0) + 1 AS next_order FROM services"
+      `
+        SELECT
+          COALESCE(MAX(sort_order), 0) + 1
+          AS next_order
+        FROM services
+      `
     );
 
     const nextSortOrder =
-      parsedSortOrder !== null && Number.isInteger(parsedSortOrder)
+      parsedSortOrder !== null &&
+      Number.isInteger(parsedSortOrder)
         ? parsedSortOrder
         : orderResult.rows[0].next_order;
 
@@ -285,12 +459,20 @@ const createService = async (req, res) => {
     return res.status(201).json({
       success: true,
       message: "Service created successfully.",
-      service: formatService(req, result.rows[0]),
+      service: formatService(
+        req,
+        result.rows[0]
+      ),
     });
   } catch (error) {
-    await removeImageFile(uploadedImagePath);
+    await removeImageFile(
+      uploadedImagePath
+    );
 
-    console.error("Create service error:", error);
+    console.error(
+      "Create service error:",
+      error
+    );
 
     return res.status(500).json({
       success: false,
@@ -306,7 +488,9 @@ const updateService = async (req, res) => {
   let newImagePath = null;
 
   try {
-    const serviceId = validateServiceId(req.params.id);
+    const serviceId = validateServiceId(
+      req.params.id
+    );
 
     if (!serviceId) {
       if (req.file) {
@@ -349,8 +533,15 @@ const updateService = async (req, res) => {
       });
     }
 
-    const existingService = existingResult.rows[0];
-    const { link_text, title, description, sort_order } = req.body;
+    const existingService =
+      existingResult.rows[0];
+
+    const {
+      link_text,
+      title,
+      description,
+      sort_order,
+    } = req.body;
 
     if (
       link_text !== undefined &&
@@ -364,11 +555,15 @@ const updateService = async (req, res) => {
 
       return res.status(400).json({
         success: false,
-        message: "Service link text cannot be empty.",
+        message:
+          "Service link text cannot be empty.",
       });
     }
 
-    if (title !== undefined && !title.trim()) {
+    if (
+      title !== undefined &&
+      !title.trim()
+    ) {
       if (req.file) {
         await removeImageFile(
           `/uploads/services/${req.file.filename}`
@@ -377,7 +572,8 @@ const updateService = async (req, res) => {
 
       return res.status(400).json({
         success: false,
-        message: "Service title cannot be empty.",
+        message:
+          "Service title cannot be empty.",
       });
     }
 
@@ -393,7 +589,8 @@ const updateService = async (req, res) => {
 
       return res.status(400).json({
         success: false,
-        message: "Service description cannot be empty.",
+        message:
+          "Service description cannot be empty.",
       });
     }
 
@@ -417,12 +614,14 @@ const updateService = async (req, res) => {
         : existingService.description;
 
     const parsedSortOrder =
-      sort_order !== undefined && sort_order !== ""
+      sort_order !== undefined &&
+      sort_order !== ""
         ? Number(sort_order)
         : existingService.sort_order;
 
     const updatedSortOrder =
-      Number.isInteger(parsedSortOrder) && parsedSortOrder >= 0
+      Number.isInteger(parsedSortOrder) &&
+      parsedSortOrder >= 0
         ? parsedSortOrder
         : existingService.sort_order;
 
@@ -457,29 +656,44 @@ const updateService = async (req, res) => {
       ]
     );
 
+    /*
+     * Delete old image only when
+     * a new image was uploaded.
+     */
     if (
       req.file &&
       existingService.image &&
-      existingService.image !== newImagePath
+      existingService.image !==
+        newImagePath
     ) {
-      await removeImageFile(existingService.image);
+      await removeImageFile(
+        existingService.image
+      );
     }
 
     return res.status(200).json({
       success: true,
       message: "Service updated successfully.",
-      service: formatService(req, result.rows[0]),
+      service: formatService(
+        req,
+        result.rows[0]
+      ),
     });
   } catch (error) {
     if (req.file && newImagePath) {
-      await removeImageFile(newImagePath);
+      await removeImageFile(
+        newImagePath
+      );
     } else if (req.file) {
       await removeImageFile(
         `/uploads/services/${req.file.filename}`
       );
     }
 
-    console.error("Update service error:", error);
+    console.error(
+      "Update service error:",
+      error
+    );
 
     return res.status(500).json({
       success: false,
@@ -493,7 +707,9 @@ const updateService = async (req, res) => {
  */
 const deleteService = async (req, res) => {
   try {
-    const serviceId = validateServiceId(req.params.id);
+    const serviceId = validateServiceId(
+      req.params.id
+    );
 
     if (!serviceId) {
       return res.status(400).json({
@@ -521,14 +737,19 @@ const deleteService = async (req, res) => {
       });
     }
 
-    await removeImageFile(result.rows[0].image);
+    await removeImageFile(
+      result.rows[0].image
+    );
 
     return res.status(200).json({
       success: true,
       message: "Service deleted successfully.",
     });
   } catch (error) {
-    console.error("Delete service error:", error);
+    console.error(
+      "Delete service error:",
+      error
+    );
 
     return res.status(500).json({
       success: false,
