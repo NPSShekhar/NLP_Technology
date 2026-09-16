@@ -112,7 +112,7 @@ export default function Aboutpage() {
         <section
           id="about-details"
           onMouseMove={handleMouseMove}
-          className="relative overflow-hidden py-16 md:py-20"
+          className="relative overflow-hidden py-16 md:py-20 lg:py-24"
         >
           <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
             <div className="absolute inset-0 opacity-100">
@@ -249,7 +249,7 @@ export default function Aboutpage() {
               }}
               className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-24"
             >
-              <div className="order-2 lg:order-1 group h-[200px] md:h-[250px] lg:h-[275px] rounded-[24px] overflow-hidden">
+              <div className="order-2 lg:order-1 group h-[200px] md:h-[300px] lg:h-[350px] rounded-[24px] overflow-hidden">
                 <img
                   src={cap1}
                   alt="Cleanroom"
@@ -257,14 +257,14 @@ export default function Aboutpage() {
                 />
               </div>
 
-              <div className="order-1 lg:order-2 bg-[#E1E5EAC2] rounded-[24px] p-8 md:p-12 flex flex-col justify-center h-[200px] md:h-[250px] lg:h-[275px]">
-                <span className="text-[#00B2F9] font-bold text-[12px] md:text-[14px] lg:text-[16px] tracking-[1.5px] uppercase mb-4 flex items-center gap-2">
+              <div className="order-1 lg:order-2 bg-[#E1E5EAC2] rounded-[24px] p-8 md:p-12 flex flex-col justify-center h-[200px] md:h-[300px] lg:h-[350px]">
+                <span className="text-[#00B2F9] font-bold text-[14px] md:text-[16px] lg:text-[18px] tracking-[1.5px] uppercase mb-4 flex items-center gap-2">
                   <span className="w-6 h-[2px] bg-[#00B2F9]"></span>
 
                   OUR MISSION
                 </span>
 
-                <p className="text-[14px] sm:text-[16px] md:text-[18px] lg:text-[20px] text-[#3E4850] font-['DM_Sans'] leading-relaxed">
+                <p className="text-[14px] sm:text-[18px] md:text-[20px] lg:text-[22px] text-[#3E4850] font-['DM_Sans'] leading-relaxed">
                   To empower our customers by delivering
                   reliable, high-quality manufacturing
                   services that drive innovation, cost
@@ -273,14 +273,14 @@ export default function Aboutpage() {
                 </p>
               </div>
 
-              <div className="order-3 lg:order-3 bg-[#E1E5EAC2] rounded-[24px] p-8 md:p-12 flex flex-col justify-center h-[200px] md:h-[250px] lg:h-[275px]">
-                <span className="text-[#00B2F9] font-bold text-[12px] md:text-[14px] lg:text-[16px] tracking-[1.5px] uppercase mb-4 flex items-center gap-2">
+              <div className="order-3 lg:order-3 bg-[#E1E5EAC2] rounded-[24px] p-8 md:p-12 flex flex-col justify-center h-[200px] md:h-[300px] lg:h-[350px]">
+                <span className="text-[#00B2F9] font-bold text-[14px] md:text-[16px] lg:text-[18px] tracking-[1.5px] uppercase mb-4 flex items-center gap-2">
                   <span className="w-6 h-[2px] bg-[#00B2F9]"></span>
 
                   OUR VISION
                 </span>
 
-                <p className="text-[14px] sm:text-[16px] md:text-[18px] lg:text-[20px] font-['DM_Sans'] text-[#3E4850] leading-relaxed">
+                <p className="text-[14px] sm:text-[18px] md:text-[20px] lg:text-[22px] font-['DM_Sans'] text-[#3E4850] leading-relaxed">
                   To be a competitive manufacturing
                   partner in Asia, recognised for
                   quality, integrity and long-term
@@ -288,7 +288,7 @@ export default function Aboutpage() {
                 </p>
               </div>
 
-              <div className="order-4 lg:order-4 group h-[200px] md:h-[250px] lg:h-[275px] rounded-[24px] overflow-hidden">
+              <div className="order-4 lg:order-4 group h-[200px] md:h-[300px] lg:h-[350px] rounded-[24px] overflow-hidden">
                 <img
                   src={cap2}
                   alt="Equipment"
@@ -296,7 +296,7 @@ export default function Aboutpage() {
                 />
               </div>
 
-              <div className="order-6 lg:order-5 group h-[200px] md:h-[250px] lg:h-[275px] rounded-[24px] overflow-hidden">
+              <div className="order-6 lg:order-5 group h-[200px] md:h-[300px] lg:h-[350px] rounded-[24px] overflow-hidden">
                 <img
                   src={teamImg}
                   alt="Our Team"
@@ -304,14 +304,14 @@ export default function Aboutpage() {
                 />
               </div>
 
-              <div className="order-5 lg:order-6 bg-[#E1E5EAC2] rounded-[24px] p-8 md:p-12 flex flex-col justify-center h-[200px] md:h-[250px] lg:h-[275px]">
-                <span className="text-[#00B2F9] font-bold text-[12px] md:text-[14px] lg:text-[16px] tracking-[1.5px] uppercase mb-4 flex items-center gap-2">
+              <div className="order-5 lg:order-6 bg-[#E1E5EAC2] rounded-[24px] p-8 md:p-12 flex flex-col justify-center h-[200px] md:h-[300px] lg:h-[350px]">
+                <span className="text-[#00B2F9] font-bold text-[14px] md:text-[16px] lg:text-[18px] tracking-[1.5px] uppercase mb-4 flex items-center gap-2">
                   <span className="w-6 h-[2px] bg-[#00B2F9]"></span>
 
                   OUR TEAM
                 </span>
 
-                <p className="text-[14px] sm:text-[16px] md:text-[18px] lg:text-[20px] font-['DM_Sans'] text-[#3E4850] leading-relaxed">
+                <p className="text-[14px] sm:text-[18px] md:text-[20px] lg:text-[22px] font-['DM_Sans'] text-[#3E4850] leading-relaxed">
                   Our team is led by experienced engineers with
                   strong technical background, ensuring that every
                   project is executed with industrial precision and

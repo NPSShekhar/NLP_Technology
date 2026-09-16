@@ -98,10 +98,4 @@ CREATE TABLE IF NOT EXISTS social_links (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-
-INSERT INTO social_links (platform, url, sort_order)
-VALUES
-    ('linkedin', 'https://www.linkedin.com/', 1),
-    ('twitter', 'https://twitter.com/', 2),
-    ('youtube', 'https://www.youtube.com/', 3)
-ON CONFLICT (platform) DO NOTHING;
+
