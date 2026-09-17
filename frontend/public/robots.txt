@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://nlptech.netopsys.in/sitemap.xml
