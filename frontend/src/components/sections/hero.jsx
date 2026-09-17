@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import heroVideo from "../../assets/hero_video.mp4";
 import { useNavigate } from "react-router-dom";
@@ -24,11 +24,13 @@ export default function Hero() {
       {/* Background Video with Gradient Overlay */}
       <div className="absolute inset-0 z-0 overflow-hidden">
         <video
-          className="absolute inset-0 w-full h-full object-cover"
+          className="absolute inset-0 w-full h-full object-cover pointer-events-none"
           autoPlay
           muted
           loop
           playsInline
+          disablePictureInPicture
+          disableRemotePlayback
         >
           <source src={heroVideo} type="video/mp4" />
         </video>
@@ -48,6 +50,26 @@ export default function Hero() {
         <div className="w-full lg:w-[65%] xl:w-[60%] flex flex-col text-left justify-end lg:justify-center lg:text-left translate-y-[125px] sm:translate-y-[185px]  lg:translate-y-0">
           {/* NEW: keyframes for the automatic word-by-word heading animation */}
           <style>{`
+            video::-webkit-media-controls {
+              display: none !important;
+            }
+            video::-webkit-media-controls-enclosure {
+              display: none !important;
+            }
+            video::-webkit-media-controls-panel {
+              display: none !important;
+            }
+            video::-webkit-media-controls-play-button {
+              display: none !important;
+            }
+            video::-webkit-media-controls-start-playback-button {
+              display: none !important;
+              -webkit-appearance: none !important;
+            }
+            video::-webkit-media-controls-overlay-play-button {
+              display: none !important;
+              -webkit-appearance: none !important;
+            }
             @keyframes heroWordIn {
               0% {
                 opacity: 0;
