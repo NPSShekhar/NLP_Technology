@@ -149,13 +149,11 @@ ${message}
             ${escapeHtml(address)}
           </p>
 
-          <p>
+          <p style="margin-bottom: 4px;">
             <strong>Message:</strong>
           </p>
 
-          <p style="white-space: pre-line;">
-            ${escapeHtml(message)}
-          </p>
+          <p style="margin-top: 0; white-space: pre-line;">${escapeHtml(message)}</p>
         </div>
       `,
     };
@@ -225,9 +223,48 @@ ${message}
     // ----------------------------------------
     await client.query("COMMIT");
 
+    // Save the enquiry before sending the customer's acknowledgement.
+    // A confirmation failure must not cause a duplicate submission.
+    client.release();
+    client = null;
+
+    let confirmationEmailSent = false;
+    try {
+      await transporter.sendMail({
+        from: process.env.MAIL_FROM,
+        to: { address: email, name },
+        replyTo: process.env.ADMIN_EMAIL,
+        subject: "We received your enquiry - NLP Technology",
+        text: [
+          `Hi ${name},`,
+          "Thank you for contacting NLP Technology Sdn. Bhd. We have received your enquiry.",
+          "Our team will review your requirements and get back to you. You can reply to this email if you need to add any details.",
+          "Regards,\nNLP Technology Sdn. Bhd.",
+        ].join("\n\n"),
+        html: `
+          <div style="font-family: Arial, sans-serif; color: #222; line-height: 1.6;">
+            <h2 style="color: #00A7E8;">We received your enquiry</h2>
+            <p>Hi ${escapeHtml(name)},</p>
+            <p>Thank you for contacting NLP Technology Sdn. Bhd. We have received your enquiry.</p>
+            <p>Our team will review your requirements and get back to you. You can reply to this email if you need to add any details.</p>
+            <p>Regards,<br>NLP Technology Sdn. Bhd.</p>
+          </div>
+        `,
+      });
+      confirmationEmailSent = true;
+    } catch (confirmationError) {
+      console.error("Enquiry confirmation email failed:", {
+        enquiryId: enquiry.id,
+        code: confirmationError.code,
+      });
+    }
+
     return res.status(201).json({
       success: true,
-      message: "Enquiry submitted successfully.",
+      message: confirmationEmailSent
+        ? "Enquiry submitted successfully. A confirmation email has been sent to your email address. Please check your inbox or spam folder."
+        : "Enquiry submitted successfully, but we could not send the confirmation email. Our team will still contact you; you do not need to submit again.",
+      confirmationEmailSent,
       enquiry: updateResult.rows[0],
     });
   } catch (error) {
