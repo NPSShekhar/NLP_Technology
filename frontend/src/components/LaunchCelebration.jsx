@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import confetti from "canvas-confetti";
+import confetti from "../lib/confetti";
 import { consumeLaunchCelebration, HOME_ROUTE } from "../lib/launch";
 
 export default function LaunchCelebration() {
