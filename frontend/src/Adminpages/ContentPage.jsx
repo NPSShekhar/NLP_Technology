@@ -13,13 +13,14 @@ import {
 import PopupImageCropper from "../components/PopupImageCropper";
 import PopupPreviewModal from "../components/PopupPreviewModal";
 import AdminLogin from "./AdminLogin";
+import EnquiriesManager from "./EnquiriesManager";
 
 const API_URL =
   import.meta.env.VITE_API_URL || "http://localhost:5001";
 
 export default function ContentPage() {
   const [activeTab, setActiveTab] = useState("popup");
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(null);
 
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
@@ -49,7 +50,7 @@ export default function ContentPage() {
   const maskImage = useMotionTemplate`radial-gradient(150px circle at ${mouseX}px ${mouseY}px, black, transparent)`;
 
   if (!isAuthenticated) {
-    return <AdminLogin onLogin={() => setIsAuthenticated(true)} />;
+    return <AdminLogin onLogin={setIsAuthenticated} />;
   }
 
   return (
@@ -92,14 +93,14 @@ export default function ContentPage() {
             </h1>
 
             <p className="mt-2 font-['DM_Sans'] text-[15px]  text-[#CBD5E1] md:text-[18px]">
-              Add, update and delete Banners, Products & Services and Social Media Content.
+              Manage Banners, Products & Services, Social Media and customer Enquiries.
             </p>
           </div>
 
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center md:flex-col md:items-center lg:flex-row">
             <button
               type="button"
-              onClick={() => setIsAuthenticated(false)}
+              onClick={() => setIsAuthenticated(null)}
               className="inline-flex h-[44px] w-fit shrink-0 whitespace-nowrap items-center gap-2 justify-center rounded-[12px] border border-[#64748B] bg-transparent px-6 font-['DM_Sans'] text-[15px] md:text-[18px] font-medium text-[#FFFFFF] transition-all duration-300 ease-out hover:bg-[#FFFFFF] hover:text-[#2A2E34] hover:scale-[1.04] active:scale-95 shadow-md"  >
               <LogOut size={18} />
               Logout
@@ -152,9 +153,15 @@ export default function ContentPage() {
           >
             Social Media
           </button>
+          <button type="button" onClick={() => setActiveTab("enquiries")}
+            className={`h-[44px] shrink-0 whitespace-nowrap rounded-xl border px-6 text-base font-semibold transition md:text-lg ${activeTab === "enquiries" ? "bg-[#00B2F9] text-white" : "bg-white text-[#2A2E34] hover:bg-[#c4e1f8]"}`}>
+            Enquiries
+          </button>
         </div>
 
-        {activeTab === "services" ? (
+        {activeTab === "enquiries" ? (
+          <EnquiriesManager authorization={isAuthenticated} />
+        ) : activeTab === "services" ? (
           <ServicesManager />
         ) : activeTab === "social" ? (
           <SocialLinksManager />

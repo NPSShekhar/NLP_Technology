@@ -184,7 +184,7 @@ const Footer = () => {
 <div className="border-t border-[#D9D9D9] mt-8 pt-6 lg:pt-4 flex flex-col lg:flex-row justify-between items-center gap-8">
 
   <p className="font-['DM_Sans'] text-[#3E4850] text-[15px] md:text-[17px] lg:text-[18px] text-center lg:text-left leading-6">
-    © {new Date().getFullYear()} NLP Technology. All rights reserved.{" "}
+    © {new Date().getFullYear()} NLP Technology Sdn. Bhd. All rights reserved.{" "}
     <br className="sm:hidden" />
     Powered by{" "}
     <a

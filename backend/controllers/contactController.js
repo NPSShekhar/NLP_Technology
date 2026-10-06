@@ -98,16 +98,19 @@ const createContactEnquiry = async (req, res) => {
     // ----------------------------------------
     // 5. Prepare email
     // ----------------------------------------
+    const mailFrom = {
+      name: "NLP Technology Sdn. Bhd.",
+      address: (process.env.MAIL_FROM.match(/<([^<>]+)>/)?.[1] || process.env.MAIL_FROM).trim(),
+    };
+
     const mailOptions = {
-      from: process.env.MAIL_FROM,
+      from: mailFrom,
       to: process.env.ADMIN_EMAIL,
       replyTo: email,
 
       subject: `New enquiry from ${name}`,
 
       text: `
-New enquiry received.
-
 Name: ${name}
 Email: ${email}
 Phone: ${phone}
@@ -117,7 +120,10 @@ Message:
 ${message}
       `.trim(),
 
+      // Blank preheader keeps enquiry details out of supporting inbox previews.
+      // Mail clients ultimately control whether they show a preview row.
       html: `
+        <div aria-hidden="true" style="display: none; font-size: 1px; line-height: 1px; max-height: 0; max-width: 0; opacity: 0; overflow: hidden; mso-hide: all;">${"&nbsp;&zwnj;&#8199;&#847;".repeat(150)}</div>
         <div
           style="
             font-family: Arial, sans-serif;
@@ -125,10 +131,6 @@ ${message}
             line-height: 1.6;
           "
         >
-          <h2 style="color: #00A7E8;">
-            New Enquiry
-          </h2>
-
           <p>
             <strong>Name:</strong>
             ${escapeHtml(name)}
@@ -153,7 +155,7 @@ ${message}
             <strong>Message:</strong>
           </p>
 
-          <p style="margin-top: 0; white-space: pre-line;">${escapeHtml(message)}</p>
+          <p style="margin: 0; white-space: pre-line;">${escapeHtml(message)}</p>
         </div>
       `,
     };
@@ -231,10 +233,10 @@ ${message}
     let confirmationEmailSent = false;
     try {
       await transporter.sendMail({
-        from: process.env.MAIL_FROM,
+        from: mailFrom,
         to: { address: email, name },
         replyTo: process.env.ADMIN_EMAIL,
-        subject: "We received your enquiry - NLP Technology",
+        subject: "We received your enquiry - NLP Technology Sdn. Bhd.",
         text: [
           `Hi ${name},`,
           "Thank you for contacting NLP Technology Sdn. Bhd. We have received your enquiry.",
@@ -242,6 +244,7 @@ ${message}
           "Regards,\nNLP Technology Sdn. Bhd.",
         ].join("\n\n"),
         html: `
+          <div aria-hidden="true" style="display: none; font-size: 1px; line-height: 1px; max-height: 0; max-width: 0; opacity: 0; overflow: hidden; mso-hide: all;">${"&nbsp;&zwnj;&#8199;&#847;".repeat(150)}</div>
           <div style="font-family: Arial, sans-serif; color: #222; line-height: 1.6;">
             <h2 style="color: #00A7E8;">We received your enquiry</h2>
             <p>Hi ${escapeHtml(name)},</p>
@@ -348,7 +351,25 @@ const getAllContactEnquiries = async (req, res) => {
   }
 };
 
+const deleteContactEnquiry = async (req, res) => {
+  const id = Number(req.params.id);
+  if (!/^\d+$/.test(req.params.id) || !Number.isSafeInteger(id) || id < 1 || id > 2147483647) {
+    return res.status(400).json({ success: false, message: "Invalid enquiry ID." });
+  }
+  try {
+    const result = await pool.query("DELETE FROM contact_enquiries WHERE id = $1 RETURNING id", [id]);
+    if (!result.rows.length) {
+      return res.status(404).json({ success: false, message: "Enquiry not found." });
+    }
+    return res.json({ success: true, message: "Enquiry deleted." });
+  } catch (error) {
+    console.error("Delete enquiry failed:", error.code);
+    return res.status(500).json({ success: false, message: "Unable to delete enquiry. Please try again." });
+  }
+};
+
 module.exports = {
   createContactEnquiry,
   getAllContactEnquiries,
+  deleteContactEnquiry,
 };

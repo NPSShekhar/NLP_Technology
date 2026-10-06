@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { User, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
 import logo from "../assets/nlp_logo.jpg";
 
@@ -9,23 +9,24 @@ export default function AdminLogin({ onLogin }) {
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
-    // Simulate a tiny delay for a premium feel
-    setTimeout(() => {
-      const expectedUsername = import.meta.env.VITE_ADMIN_USERNAME;
-      const expectedPassword = import.meta.env.VITE_ADMIN_PASSWORD;
-
-      if (username === expectedUsername && password === expectedPassword) {
-        setError("");
-        onLogin();
-      } else {
-        setError("Invalid username or password");
-        setIsSubmitting(false);
-      }
-    }, 600);
+    setError("");
+    const bytes = new TextEncoder().encode(username + ":" + password);
+    const authorization = "Basic " + btoa(Array.from(bytes, byte => String.fromCharCode(byte)).join(""));
+    try {
+      const response = await fetch((import.meta.env.VITE_API_URL || "http://localhost:5001") + "/api/contact-enquiries/access", {
+        method: "POST", headers: { Authorization: authorization },
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || "Unable to sign in.");
+      onLogin(authorization);
+    } catch (error) {
+      setError(error.message || "Unable to sign in. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (

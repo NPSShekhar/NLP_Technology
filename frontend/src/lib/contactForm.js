@@ -370,7 +370,7 @@ export const useContactEnquiryForm = () => {
       setSubmitting(true);
       setSubmitError("");
 
-      const apiMessage = form.message.trim() + (form.file ? `\n\n[Attached File: ${form.file.name}]` : "");
+      const apiMessage = form.message.trim();
 
       const formData = new FormData();
       formData.append("name", form.name.trim());

@@ -49,7 +49,7 @@ async function submit({ body = validBody, failMail, failCommit = false, file } =
       return dependencies[id];
     },
     module: { exports: {} },
-    process: { env: { MAIL_FROM: "sender@example.com", ADMIN_EMAIL: "admin@example.com" } },
+    process: { env: { MAIL_FROM: "NLP Technology <sender@example.com>", ADMIN_EMAIL: "admin@example.com" } },
     console: { log() {}, error() {} },
   };
   vm.runInNewContext(source, sandbox);
@@ -71,7 +71,10 @@ test("sends a separate confirmation to the entered email after saving the enquir
   assert.equal(mails[0].replyTo, "customer@example.com");
   assert.equal(mails[0].attachments[0].content, file.buffer);
   assert.equal(mails[1].to.address, "customer@example.com");
-  assert.equal(mails[1].from, "sender@example.com");
+  assert.equal(mails[0].from.name, "NLP Technology Sdn. Bhd.");
+  assert.equal(mails[1].from.name, "NLP Technology Sdn. Bhd.");
+  assert.equal(mails[1].from.address, "sender@example.com");
+  assert.equal(mails[1].subject, "We received your enquiry - NLP Technology Sdn. Bhd.");
   assert.equal(mails[1].replyTo, "admin@example.com");
   assert.match(mails[1].text, /Hi Test Customer/);
   assert.doesNotMatch(mails[1].text, /Enquiry reference/i);

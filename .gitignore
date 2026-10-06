@@ -12,6 +12,7 @@ node_modules/
 # Build
 dist/
 dist-ssr/
+.launch-verification/
 
 # Environment
 .env

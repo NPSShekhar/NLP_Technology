@@ -14,6 +14,9 @@ import TermsConditions from "./pages/TermsConditions";
 import ContentPage from "./Adminpages/ContentPage";
 import PopupBanner from "./components/PopupBanner";
 import ContentProtection from "./components/ContentProtection";
+import LaunchingPage from "./pages/LaunchingPage";
+import LaunchCelebration from "./components/LaunchCelebration";
+import { HOME_ROUTE } from "./lib/launch";
 
 function ScrollToTop() {
   const { pathname, hash, state } = useLocation();
@@ -35,19 +38,22 @@ function App() {
   const { pathname } = useLocation();
 
   const isAdminPage = pathname === "/admin";
+  const isLaunchingPage = pathname.replace(/\/$/, "").toLowerCase() === "/launching";
 
   return (
     <>
       <ScrollToTop />
+      <LaunchCelebration />
 
       {/* Content protection for public website only */}
       {!isAdminPage && <ContentProtection />}
 
       {/* Popup banner for public website only */}
-      {!isAdminPage && <PopupBanner />}
+      {!isAdminPage && !isLaunchingPage && <PopupBanner />}
 
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path={HOME_ROUTE} element={<Home />} />
+        <Route path="/launching" element={<LaunchingPage />} />
         <Route path="/about" element={<Aboutpage />} />
         <Route path="/services" element={<Servicespage />} />
         <Route path="/contact" element={<Contactpage />} />
