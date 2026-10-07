@@ -836,7 +836,7 @@ export function SuccessPopupModal({
           Request Sent!
         </h3>
 
-        <p className="mt-4 font-['DM_Sans'] text-[14px] md:text-[15px] lg:text-[16px] text-[#64748B] max-w-[320px]">
+        <p className="mt-4 font-['DM_Sans'] text-[16px] md:text-[17px] lg:text-[18px] text-[#64748B] max-w-[320px]">
           Thank you for reaching out. Our team will review your details and
           contact you within one business day.
         </p>

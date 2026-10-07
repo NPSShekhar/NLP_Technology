@@ -37,7 +37,7 @@ function ScrollToTop() {
 function App() {
   const { pathname } = useLocation();
 
-  const isAdminPage = pathname === "/admin";
+  const isAdminPage = /^\/admin(?:\/|$)/i.test(pathname);
   const isLaunchingPage = pathname.replace(/\/$/, "").toLowerCase() === "/launching";
 
   return (

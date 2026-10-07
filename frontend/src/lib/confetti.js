@@ -62,24 +62,19 @@ export function create(canvas, { resize = true } = {}) {
         const wobbleX = p.x + 10 * p.scalar * dpr * Math.cos(p.wobble);
         const wobbleY = p.y + 10 * p.scalar * dpr * Math.sin(p.wobble);
         const tiltCos = Math.cos(p.tiltAngle);
-        const tiltSin = Math.sin(p.tiltAngle);
 
         const progress = p.tick / p.totalTicks;
         const alpha = Math.max(0, 1 - progress);
 
-        const x1 = p.x + p.random * tiltCos * dpr;
-        const y1 = p.y + p.random * tiltSin * dpr;
-        const x2 = wobbleX + p.random * tiltCos * dpr;
-        const y2 = wobbleY + p.random * tiltSin * dpr;
-
+        // Small tumbling paper rectangles, with a visible face instead of thin shards.
+        const size = 6 * p.scalar * dpr;
         ctx.fillStyle = `rgba(${p.color.r}, ${p.color.g}, ${p.color.b}, ${alpha})`;
-        ctx.beginPath();
-        ctx.moveTo(p.x, p.y);
-        ctx.lineTo(x1, y1);
-        ctx.lineTo(x2, y2);
-        ctx.lineTo(wobbleX, wobbleY);
-        ctx.closePath();
-        ctx.fill();
+        ctx.save();
+        ctx.translate(wobbleX, wobbleY);
+        ctx.rotate(p.tiltAngle);
+        ctx.scale(1, Math.max(0.25, Math.abs(tiltCos)));
+        ctx.fillRect(-size / 2, -size / 3, size, size * 0.7);
+        ctx.restore();
 
         if (p.tick >= p.totalTicks || p.y > canvas.height + 80) {
           particles.splice(i, 1);

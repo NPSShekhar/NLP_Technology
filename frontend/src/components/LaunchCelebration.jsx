@@ -40,7 +40,7 @@ export default function LaunchCelebration() {
             startVelocity: 16 * Math.min(1.5, window.innerWidth / 1280),
             decay: 0.975,
             gravity: 0.6 * window.innerHeight / 900,
-            scalar: 1.2,
+            scalar: 1.8,
             ticks: 660,
             disableForReducedMotion: true,
           };

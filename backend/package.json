@@ -6,8 +6,9 @@
   "scripts": {
     "test": "node --test",
     "start": "node server.js",
-    "dev": "nodemon server.js",
-    "build": "echo \"No build step required for backend\""
+    "dev": "nodemon --watch . --watch .env --ext js,mjs,cjs,json,env server.js",
+    "build": "echo \"No build step required for backend\"",
+    "smtp:verify": "node scripts/verifySmtp.js"
   },
   "keywords": [],
   "author": "",

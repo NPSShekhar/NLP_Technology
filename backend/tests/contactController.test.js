@@ -19,9 +19,11 @@ const validBody = {
 async function submit({ body = validBody, failMail, failCommit = false, file } = {}) {
   const queries = [];
   const mails = [];
+  const queryValues = [];
   let releases = 0;
   const client = {
-    async query(sql) {
+    async query(sql, values) {
+      queryValues.push(values);
       queries.push(sql.trim());
       if (failCommit && sql === "COMMIT") throw new Error("Commit failed");
       return { rows: [{ id: 42, email_sent: sql.includes("UPDATE") }] };
@@ -29,8 +31,10 @@ async function submit({ body = validBody, failMail, failCommit = false, file } =
     release() { releases++; },
   };
   const dependencies = {
+    "../utils/smtpError": require("../utils/smtpError"),
     "../config/db": { async connect() { return client; } },
     "../config/mailer": {
+      validateConfiguration() {},
       async sendMail(options) {
         mails.push(options);
         if (mails.length === 2) {
@@ -49,7 +53,7 @@ async function submit({ body = validBody, failMail, failCommit = false, file } =
       return dependencies[id];
     },
     module: { exports: {} },
-    process: { env: { MAIL_FROM: "NLP Technology <sender@example.com>", ADMIN_EMAIL: "admin@example.com" } },
+    process: { env: { MAIL_FROM: "NLP Technology <sender@example.com>", ADMIN_EMAIL: "sales@tariustechnology.com", MAIL_SUBJECT: "Enquiry from NLPTech Website" } },
     console: { log() {}, error() {} },
   };
   vm.runInNewContext(source, sandbox);
@@ -58,16 +62,20 @@ async function submit({ body = validBody, failMail, failCommit = false, file } =
     json(data) { this.body = data; return this; },
   };
   await sandbox.module.exports.createContactEnquiry({ body, file }, res);
-  return { queries, mails, releases, res };
+  return { queries, queryValues, mails, releases, res };
 }
 
 test("sends a separate confirmation to the entered email after saving the enquiry", async () => {
   const file = { originalname: "quote.pdf", buffer: Buffer.from("example attachment") };
-  const { res, mails, releases } = await submit({ file });
+  const { res, mails, releases, queryValues } = await submit({ file });
+  assert.equal(queryValues[1][5], file.originalname);
+  assert.equal(queryValues[1][7], file.buffer);
   assert.equal(res.statusCode, 201);
   assert.equal(res.body.confirmationEmailSent, true);
   assert.equal(mails.length, 2);
-  assert.equal(mails[0].to, "admin@example.com");
+  assert.equal(mails[0].to, "sales@tariustechnology.com");
+  assert.equal(mails[0].subject, "Enquiry from NLPTech Website");
+  assert.equal(mails[0].from.address, "sender@example.com");
   assert.equal(mails[0].replyTo, "customer@example.com");
   assert.equal(mails[0].attachments[0].content, file.buffer);
   assert.equal(mails[1].to.address, "customer@example.com");
@@ -75,7 +83,7 @@ test("sends a separate confirmation to the entered email after saving the enquir
   assert.equal(mails[1].from.name, "NLP Technology Sdn. Bhd.");
   assert.equal(mails[1].from.address, "sender@example.com");
   assert.equal(mails[1].subject, "We received your enquiry - NLP Technology Sdn. Bhd.");
-  assert.equal(mails[1].replyTo, "admin@example.com");
+  assert.equal(mails[1].replyTo, "sales@tariustechnology.com");
   assert.match(mails[1].text, /Hi Test Customer/);
   assert.doesNotMatch(mails[1].text, /Enquiry reference/i);
   assert.doesNotMatch(mails[1].html, /Enquiry reference/i);

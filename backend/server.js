@@ -3,12 +3,7 @@ const cors = require("cors");
 const path = require("path");
 const multer = require("multer");
 
-// IMPORTANT:
-// .env file is located at:
-// /httpdocs/app/backend/.env
-require("dotenv").config({
-  path: path.join(__dirname, ".env"),
-});
+require("./config/env");
 
 const pool = require("./config/db");
 const runMigrations = require("./utils/runMigrations");
@@ -396,29 +391,7 @@ const startServer = async () => {
     |--------------------------------------------------------------------------
     */
 
-    if (!process.env.SMTP_USER) {
-      throw new Error(
-        "SMTP_USER is not configured."
-      );
-    }
-
-    if (!process.env.SMTP_APP_PASSWORD) {
-      throw new Error(
-        "SMTP_APP_PASSWORD is not configured."
-      );
-    }
-
-    if (!process.env.ADMIN_EMAIL) {
-      throw new Error(
-        "ADMIN_EMAIL is not configured."
-      );
-    }
-
-    if (!process.env.MAIL_FROM) {
-      throw new Error(
-        "MAIL_FROM is not configured."
-      );
-    }
+    transporter.validateConfiguration();
 
     /*
     |--------------------------------------------------------------------------
@@ -440,15 +413,7 @@ const startServer = async () => {
     |--------------------------------------------------------------------------
     */
 
-    console.log(
-      "Checking SMTP connection..."
-    );
-
-    await transporter.verify();
-
-    console.log(
-      "SMTP connection verified successfully."
-    );
+    // SMTP verification is explicit: npm run smtp:verify.
 
     /*
     |--------------------------------------------------------------------------
@@ -535,10 +500,7 @@ const startServer = async () => {
       "========================================"
     );
 
-    console.error(
-      "Message:",
-      error.message
-    );
+    console.error("Startup failure:", error.code === "SMTP_CONFIG_INVALID" ? error.message : "Check backend configuration and service availability.");
 
     console.error(
       "Name:",
@@ -548,16 +510,6 @@ const startServer = async () => {
     console.error(
       "Code:",
       error.code
-    );
-
-    console.error(
-      "Command:",
-      error.command
-    );
-
-    console.error(
-      "Response:",
-      error.response
     );
 
     console.error(

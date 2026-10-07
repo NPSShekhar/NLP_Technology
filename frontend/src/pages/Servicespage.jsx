@@ -38,10 +38,13 @@ function RelatedProductsCarousel({ products }) {
       return undefined;
     }
 
+    const preventWheel = (event) => event.preventDefault();
+    container.addEventListener("wheel", preventWheel, { passive: false });
     container.addEventListener("scroll", updateScrollState);
     window.addEventListener("resize", updateScrollState);
 
     return () => {
+      container.removeEventListener("wheel", preventWheel);
       container.removeEventListener("scroll", updateScrollState);
       window.removeEventListener("resize", updateScrollState);
     };
@@ -84,7 +87,7 @@ const showArrows =
       <div
         ref={scrollRef}
         className="flex gap-5 md:gap-6 overflow-hidden scroll-smooth"
-        onWheel={(event) => event.preventDefault()}
+
       >
         {products.map((product) => (
           <div

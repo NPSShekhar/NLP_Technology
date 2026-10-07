@@ -1,3 +1,4 @@
+const smtpError = require("../utils/smtpError");
 const pool = require("../config/db");
 const transporter = require("../config/mailer");
 
@@ -45,6 +46,7 @@ const createContactEnquiry = async (req, res) => {
     // ----------------------------------------
     // 2. Get database connection
     // ----------------------------------------
+    transporter.validateConfiguration();
     client = await pool.connect();
 
     await client.query("BEGIN");
@@ -59,9 +61,9 @@ const createContactEnquiry = async (req, res) => {
           email,
           phone,
           address,
-          message
+          message, file_name, file_type, file_data
         )
-        VALUES ($1, $2, $3, $4, $5)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
         RETURNING
           id,
           name,
@@ -79,6 +81,9 @@ const createContactEnquiry = async (req, res) => {
         phone,
         address,
         message,
+        req.file?.originalname || null,
+        req.file?.mimetype || null,
+        req.file?.buffer || null,
       ]
     );
 
@@ -108,7 +113,7 @@ const createContactEnquiry = async (req, res) => {
       to: process.env.ADMIN_EMAIL,
       replyTo: email,
 
-      subject: `New enquiry from ${name}`,
+      subject: process.env.MAIL_SUBJECT,
 
       text: `
 Name: ${name}
@@ -187,10 +192,6 @@ ${message}
     // 7. Send email
     // ----------------------------------------
     console.log("Sending contact enquiry email...");
-    console.log("MAIL_FROM:", process.env.MAIL_FROM);
-    console.log("ADMIN_EMAIL:", process.env.ADMIN_EMAIL);
-    console.log("Reply-To:", email);
-    console.log("Attachment:", req.file ? req.file.originalname : "None");
 
     await transporter.sendMail(mailOptions);
 
@@ -258,7 +259,7 @@ ${message}
     } catch (confirmationError) {
       console.error("Enquiry confirmation email failed:", {
         enquiryId: enquiry.id,
-        code: confirmationError.code,
+        ...smtpError(confirmationError),
       });
     }
 
@@ -292,11 +293,7 @@ ${message}
       "Contact enquiry submission error:"
     );
 
-    console.error("Message:", error.message);
-    console.error("Name:", error.name);
-    console.error("Code:", error.code);
-    console.error("Command:", error.command);
-    console.error("Response:", error.response);
+    console.error("SMTP diagnostic:", smtpError(error));
 
     return res.status(500).json({
       success: false,
@@ -328,7 +325,8 @@ const getAllContactEnquiries = async (req, res) => {
         message,
         email_sent,
         email_sent_at,
-        created_at
+        created_at,
+        file_name, file_type
       FROM contact_enquiries
       ORDER BY created_at DESC
     `);
@@ -368,7 +366,29 @@ const deleteContactEnquiry = async (req, res) => {
   }
 };
 
+const getContactFile = async (req, res) => {
+  const id = Number(req.params.id);
+  if (!/^\d+$/.test(req.params.id) || !Number.isSafeInteger(id) || id < 1 || id > 2147483647) {
+    return res.status(400).json({ message: "Invalid enquiry ID." });
+  }
+  try {
+    const result = await pool.query("SELECT file_name, file_type, file_data FROM contact_enquiries WHERE id = $1", [id]);
+    const file = result.rows[0];
+    if (!file?.file_data) return res.status(404).json({ message: "No uploaded file is available for this enquiry." });
+    const safeTypes = ["application/pdf", "image/png", "image/jpeg", "image/gif", "image/webp", "text/plain"];
+    res.attachment(file.file_name || "attachment");
+    res.setHeader("Content-Type", safeTypes.includes(file.file_type) ? file.file_type : "application/octet-stream");
+    res.setHeader("X-Content-Type-Options", "nosniff");
+    res.setHeader("Content-Security-Policy", "sandbox");
+    return res.send(file.file_data);
+  } catch (error) {
+    console.error("Get enquiry file failed:", error.code);
+    return res.status(500).json({ message: "Unable to retrieve uploaded file." });
+  }
+};
+
 module.exports = {
+  getContactFile,
   createContactEnquiry,
   getAllContactEnquiries,
   deleteContactEnquiry,

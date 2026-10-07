@@ -12,8 +12,10 @@ test("enquiry routes protect personal data and validate/delete only the selected
   const queries = [];
   let fail = false;
   const dependencies = {
+    "../utils/smtpError": require("../utils/smtpError"),
     "../config/db": { async query(sql, values) {
       queries.push({ sql, values });
+      if (sql.startsWith("SELECT file_name")) return { rows: values[0] === 7 ? [{ file_name: "unsafe.html", file_type: "text/html", file_data: Buffer.from("<h1>attachment</h1>") }] : [] };
       if (fail) throw new Error("Database unavailable");
       return { rows: sql.startsWith("DELETE") ? values[0] === 7 ? [{ id: 7 }] : [] : [{ id: 7, name: "Example", message: "Private enquiry" }] };
     } },
@@ -31,7 +33,7 @@ test("enquiry routes protect personal data and validate/delete only the selected
   const url = `http://127.0.0.1:${server.address().port}/enquiries`;
   const headers = { Authorization: `Basic ${Buffer.from("test-admin:test-password").toString("base64")}` };
   try {
-    for (const [method, suffix] of [["GET", ""], ["DELETE", "/7"], ["POST", "/access"]]) {
+    for (const [method, suffix] of [["GET", ""], ["DELETE", "/7"], ["POST", "/access"], ["GET", "/7/file"]]) {
       const response = await fetch(url + suffix, { method });
       assert.equal(response.status, 401);
     }
@@ -50,6 +52,14 @@ test("enquiry routes protect personal data and validate/delete only the selected
     assert.equal(queries.at(-1).sql, "DELETE FROM contact_enquiries WHERE id = $1 RETURNING id");
     assert.equal(queries.at(-1).values[0], 7);
     assert.equal((await fetch(url + "/99", { method: "DELETE", headers })).status, 404);
+    const file = await fetch(url + "/7/file", { headers });
+    assert.equal(file.status, 200);
+    assert.equal(file.headers.get("content-type"), "application/octet-stream");
+    assert.equal(file.headers.get("cache-control"), "no-store");
+    assert.match(file.headers.get("content-disposition"), /attachment/);
+    assert.equal(await file.text(), "<h1>attachment</h1>");
+    assert.equal((await fetch(url + "/99/file", { headers })).status, 404);
+    assert.equal((await fetch(url + "/abc/file", { headers })).status, 400);
     fail = true;
     assert.equal((await fetch(url + "/7", { method: "DELETE", headers })).status, 500);
   } finally {

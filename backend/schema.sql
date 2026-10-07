@@ -98,4 +98,8 @@ CREATE TABLE IF NOT EXISTS social_links (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-
+
+-- Keep enquiry uploads private and delete them with their enquiry.
+ALTER TABLE contact_enquiries ADD COLUMN IF NOT EXISTS file_name TEXT;
+ALTER TABLE contact_enquiries ADD COLUMN IF NOT EXISTS file_type TEXT;
+ALTER TABLE contact_enquiries ADD COLUMN IF NOT EXISTS file_data BYTEA;

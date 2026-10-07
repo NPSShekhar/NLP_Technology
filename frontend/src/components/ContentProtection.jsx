@@ -2,6 +2,7 @@ import { useEffect } from "react";
 
 export default function ContentProtection() {
   useEffect(() => {
+    document.documentElement.classList.add("content-protected");
     // Block right-click ONLY on images
     const handleContextMenu = (event) => {
       if (event.target?.tagName?.toLowerCase() === "img") {
@@ -137,6 +138,7 @@ export default function ContentProtection() {
     document.addEventListener("keydown", handleKeyDown);
 
     return () => {
+      document.documentElement.classList.remove("content-protected");
       document.removeEventListener("contextmenu", handleContextMenu);
       document.removeEventListener("selectstart", handleSelectStart);
       document.removeEventListener("dragstart", handleDragStart);

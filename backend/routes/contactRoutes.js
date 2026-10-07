@@ -1,6 +1,7 @@
 const express = require("express");
 
 const {
+  getContactFile,
   createContactEnquiry,
   getAllContactEnquiries,
   deleteContactEnquiry,
@@ -19,6 +20,7 @@ router.post("/", upload.single("file"), createContactEnquiry);
 
 router.post("/access", requireAdmin, (req, res) => res.json({ success: true }));
 router.get("/", requireAdmin, getAllContactEnquiries);
+router.get("/:id/file", requireAdmin, getContactFile);
 router.delete("/:id", requireAdmin, deleteContactEnquiry);
 
 module.exports = router;
