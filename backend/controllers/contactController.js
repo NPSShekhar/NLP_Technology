@@ -125,10 +125,7 @@ Message:
 ${message}
       `.trim(),
 
-      // Blank preheader keeps enquiry details out of supporting inbox previews.
-      // Mail clients ultimately control whether they show a preview row.
       html: `
-        <div aria-hidden="true" style="display: none; font-size: 1px; line-height: 1px; max-height: 0; max-width: 0; opacity: 0; overflow: hidden; mso-hide: all;">${"&nbsp;&zwnj;&#8199;&#847;".repeat(150)}</div>
         <div
           style="
             font-family: Arial, sans-serif;
@@ -245,9 +242,8 @@ ${message}
           "Regards,\nNLP Technology Sdn. Bhd.",
         ].join("\n\n"),
         html: `
-          <div aria-hidden="true" style="display: none; font-size: 1px; line-height: 1px; max-height: 0; max-width: 0; opacity: 0; overflow: hidden; mso-hide: all;">${"&nbsp;&zwnj;&#8199;&#847;".repeat(150)}</div>
           <div style="font-family: Arial, sans-serif; color: #222; line-height: 1.6;">
-            <h2 style="color: #00A7E8;">We received your enquiry</h2>
+            <h2 style="color: #00A7E8; margin-top: 0;">We received your enquiry</h2>
             <p>Hi ${escapeHtml(name)},</p>
             <p>Thank you for contacting NLP Technology Sdn. Bhd. We have received your enquiry.</p>
             <p>Our team will review your requirements and get back to you. You can reply to this email if you need to add any details.</p>
