@@ -11,38 +11,59 @@ export default function LaunchCelebration() {
 
     let frame;
     let cleanup = () => {};
-    // Two frames ensure the existing Home page has painted. StrictMode's
-    // first cleanup cancels its frame before the intent can be consumed.
+
     frame = requestAnimationFrame(() => {
       frame = requestAnimationFrame(() => {
         if (!consumeLaunchCelebration(state.launchCelebration)) return;
-        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+        // Clean up history state immediately so page refresh will not re-trigger celebration
+        if (typeof window !== "undefined" && window.history?.replaceState) {
+          try {
+            const currentHistoryState = window.history.state;
+            if (currentHistoryState && typeof currentHistoryState === "object") {
+              if (currentHistoryState.usr && typeof currentHistoryState.usr === "object") {
+                const updatedUsr = { ...currentHistoryState.usr };
+                delete updatedUsr.launchCelebration;
+                window.history.replaceState({ ...currentHistoryState, usr: updatedUsr }, "");
+              } else if (currentHistoryState.launchCelebration) {
+                const updatedState = { ...currentHistoryState };
+                delete updatedState.launchCelebration;
+                window.history.replaceState(updatedState, "");
+              }
+            }
+          } catch {
+            // Ignore history state errors
+          }
+        }
 
         const canvas = document.createElement("canvas");
         canvas.setAttribute("aria-hidden", "true");
         canvas.dataset.launchCelebration = "true";
         Object.assign(canvas.style, {
-          position: "fixed", inset: "0", width: "100%", height: "100%",
-          pointerEvents: "none", zIndex: "2147483647",
+          position: "fixed",
+          inset: "0",
+          width: "100%",
+          height: "100%",
+          pointerEvents: "none",
+          zIndex: "2147483647",
         });
         document.body.appendChild(canvas);
         const burst = confetti.create(canvas, { resize: true });
-        // Two fixed top-corner emitters fan inward, then the paper falls away.
+
         const startedAt = performance.now();
-        const palette = ["#e5a20b", "#202020", "#337ead", "#ddd2bb"];
+        const palette = ["#e5a20b", "#202020", "#337ead", "#ddd2bb", "#00B2F9"];
         const emitRain = () => {
           if (performance.now() - startedAt >= 4200) return;
           const options = {
             colors: palette,
             shapes: ["square"],
-            particleCount: window.innerWidth < 640 ? 3 : 6,
+            particleCount: window.innerWidth < 640 ? 4 : 8,
             spread: 70,
             startVelocity: 16 * Math.min(1.5, window.innerWidth / 1280),
             decay: 0.975,
-            gravity: 0.6 * window.innerHeight / 900,
+            gravity: (0.6 * window.innerHeight) / 900,
             scalar: 1.8,
             ticks: 660,
-            disableForReducedMotion: true,
           };
           for (const side of ["left", "right"]) {
             burst({
@@ -53,10 +74,12 @@ export default function LaunchCelebration() {
             });
           }
         };
+
         emitRain();
         const rain = setInterval(emitRain, 120);
         const stopRain = setTimeout(() => clearInterval(rain), 4200);
         const finish = setTimeout(() => cleanup(), 12600);
+
         cleanup = () => {
           clearInterval(rain);
           clearTimeout(stopRain);
@@ -66,6 +89,7 @@ export default function LaunchCelebration() {
         };
       });
     });
+
     return () => {
       cancelAnimationFrame(frame);
       cleanup();

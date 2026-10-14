@@ -196,9 +196,8 @@ export default function Servicespage() {
         setLoading(true);
         setError("");
 
-     const apiUrl =
-  import.meta.env.VITE_API_URL ||
-  window.location.origin;
+        const apiUrl =
+          import.meta.env.VITE_API_URL || "http://localhost:5001";
 
         const [servicesResponse, relatedProductsResponse] =
           await Promise.all([
@@ -212,22 +211,31 @@ export default function Servicespage() {
             }),
           ]);
 
-        const servicesData = await servicesResponse.json();
-        const relatedProductsData =
-          await relatedProductsResponse.json();
-
         if (!servicesResponse.ok) {
-          throw new Error(
-            servicesData.message || "Failed to fetch services"
-          );
+          let message = "Failed to fetch services";
+          try {
+            const data = await servicesResponse.json();
+            message = data.message || message;
+          } catch {
+            // Not a JSON error response
+          }
+          throw new Error(message);
         }
 
         if (!relatedProductsResponse.ok) {
-          throw new Error(
-            relatedProductsData.message ||
-              "Failed to fetch related products"
-          );
+          let message = "Failed to fetch related products";
+          try {
+            const data = await relatedProductsResponse.json();
+            message = data.message || message;
+          } catch {
+            // Not a JSON error response
+          }
+          throw new Error(message);
         }
+
+        const servicesData = await servicesResponse.json();
+        const relatedProductsData =
+          await relatedProductsResponse.json();
 
         setServices(
           Array.isArray(servicesData.services)

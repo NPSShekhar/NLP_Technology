@@ -1,6 +1,51 @@
 export const HOME_ROUTE = "/";
+export const LAUNCH_DURATION_SECONDS = 65; // 2 minutes
 
-// A timezone offset makes the launch instant identical for all visitors.
+const STORAGE_KEY = "nlp_launch_target_time";
+
+export function getLaunchTargetTime() {
+  if (typeof window === "undefined") {
+    return Date.now() + LAUNCH_DURATION_SECONDS * 1000;
+  }
+  try {
+    const stored = window.sessionStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      const parsed = parseInt(stored, 10);
+      if (Number.isFinite(parsed)) {
+        return parsed;
+      }
+    }
+    const newTarget = Date.now() + LAUNCH_DURATION_SECONDS * 1000;
+    window.sessionStorage.setItem(STORAGE_KEY, String(newTarget));
+    return newTarget;
+  } catch {
+    return Date.now() + LAUNCH_DURATION_SECONDS * 1000;
+  }
+}
+
+export function resetLaunchTargetTime() {
+  if (typeof window === "undefined") return;
+  try {
+    window.sessionStorage.removeItem(STORAGE_KEY);
+  } catch {
+    // Ignore storage errors
+  }
+}
+
+export function currentLaunchState() {
+  if (typeof window === "undefined") {
+    return { phase: "countdown", seconds: LAUNCH_DURATION_SECONDS };
+  }
+  const target = getLaunchTargetTime();
+  const diff = target - Date.now();
+  // STOP at 01 sec and freeze: never count down to 0, never reset to 120 while on page
+  if (diff <= 1000) {
+    return { phase: "ready", seconds: 1 };
+  }
+  return { phase: "countdown", seconds: Math.ceil(diff / 1000) };
+}
+
+// Retained for existing test suite compatibility
 export function launchScheduleState(launchAt, countdownMinutes = 10, now = Date.now()) {
   const value = String(launchAt || "").trim();
   const deadline = /T.*(?:Z|[+-]\d{2}:\d{2})$/i.test(value) ? Date.parse(value) : NaN;
@@ -9,25 +54,57 @@ export function launchScheduleState(launchAt, countdownMinutes = 10, now = Date.
   const windowMs = (Number.isFinite(minutes) && minutes > 0 ? minutes : 10) * 60000;
   const remaining = deadline - now;
   if (remaining > windowMs) return { phase: "soon", seconds: null };
-  // Hold the final display at 01; unlock at the configured launch time.
   if (remaining <= 0) return { phase: "ready", seconds: 1 };
   return { phase: "countdown", seconds: Math.ceil(remaining / 1000) };
 }
 
-export function currentLaunchState() {
-  return launchScheduleState(import.meta.env.VITE_LAUNCH_AT, import.meta.env.VITE_LAUNCH_COUNTDOWN_MINUTES);
+const CONSUMED_STORAGE_KEY = "nlp_consumed_launch_celebrations";
+
+function getConsumedStorage() {
+  if (typeof window === "undefined") return new Set();
+  try {
+    const raw = window.sessionStorage.getItem(CONSUMED_STORAGE_KEY);
+    if (!raw) return new Set();
+    const parsed = JSON.parse(raw);
+    return new Set(Array.isArray(parsed) ? parsed : []);
+  } catch {
+    return new Set();
+  }
 }
 
-// Memory-only intent cannot survive refresh or be replayed by browser history.
+function persistConsumedToken(token) {
+  if (typeof window === "undefined" || !token) return;
+  try {
+    const set = getConsumedStorage();
+    set.add(String(token));
+    window.sessionStorage.setItem(CONSUMED_STORAGE_KEY, JSON.stringify([...set]));
+  } catch {
+    // Ignore storage errors
+  }
+}
+
 let pendingCelebration = null;
+const consumedCelebrations = new Set();
 
 export function prepareLaunchCelebration() {
-  pendingCelebration = crypto.randomUUID();
-  return pendingCelebration;
+  const token = typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : String(Date.now() + Math.random());
+  pendingCelebration = token;
+  return token;
 }
 
 export function consumeLaunchCelebration(token) {
-  if (!token || token !== pendingCelebration) return false;
+  if (!token) return false;
+  const strToken = String(token);
+  if (!pendingCelebration || strToken !== pendingCelebration) return false;
+  if (consumedCelebrations.has(strToken)) return false;
+  const stored = getConsumedStorage();
+  if (stored.has(strToken)) {
+    consumedCelebrations.add(strToken);
+    return false;
+  }
+  consumedCelebrations.add(strToken);
+  persistConsumedToken(strToken);
   pendingCelebration = null;
   return true;
 }
+

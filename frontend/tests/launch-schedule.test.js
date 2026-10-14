@@ -17,3 +17,17 @@ test('missing or invalid configuration stays on Launching soon', () => {
   assert.equal(launchScheduleState(launch, 5, deadline - 360000).phase, 'soon');
   assert.equal(launchScheduleState(launch, 'invalid', deadline - 600000).seconds, 600);
 });
+
+test('launch celebration token is consumed exactly once and persists across reloads', async () => {
+  const { prepareLaunchCelebration, consumeLaunchCelebration } = await import('../src/lib/launch.js');
+  
+  assert.equal(consumeLaunchCelebration(null), false);
+  assert.equal(consumeLaunchCelebration(''), false);
+
+  const token = prepareLaunchCelebration();
+  assert.ok(token);
+  assert.equal(consumeLaunchCelebration(token), true);
+  // Re-consuming same token (e.g. on page refresh) must fail
+  assert.equal(consumeLaunchCelebration(token), false);
+});
+
