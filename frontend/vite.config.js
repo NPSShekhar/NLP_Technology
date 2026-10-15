@@ -8,7 +8,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 // https://vite.dev/config/
 export default defineConfig({
-  envDir: '../backend',
+  envDir: __dirname,
   plugins: [
     react(),
     babel({ presets: [reactCompilerPreset()] })

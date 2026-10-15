@@ -7,6 +7,7 @@ const {
   deleteContactEnquiry,
 } = require("../controllers/contactController");
 const requireAdmin = require("../middleware/requireAdmin");
+const verifyRecaptcha = require("../middleware/verifyRecaptcha");
 const multer = require("multer");
 
 const upload = multer({
@@ -16,9 +17,9 @@ const upload = multer({
 
 const router = express.Router();
 
-router.post("/", upload.single("file"), createContactEnquiry);
+router.post("/", verifyRecaptcha("enquiry_submit"), upload.single("file"), createContactEnquiry);
 
-router.post("/access", requireAdmin, (req, res) => res.json({ success: true }));
+router.post("/access", verifyRecaptcha("admin_login"), requireAdmin, (req, res) => res.json({ success: true }));
 router.get("/", requireAdmin, getAllContactEnquiries);
 router.get("/:id/file", requireAdmin, getContactFile);
 router.delete("/:id", requireAdmin, deleteContactEnquiry);

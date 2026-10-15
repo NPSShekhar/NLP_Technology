@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { User, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
+import { getRecaptchaToken } from "../lib/recaptcha";
 import logo from "../assets/nlp_logo.jpg";
 
 export default function AdminLogin({ onLogin }) {
+  const submissionLock = useRef(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -11,13 +13,20 @@ export default function AdminLogin({ onLogin }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (submissionLock.current) return;
+    if (!username.trim() || !password) {
+      setError("Enter your username and password.");
+      return;
+    }
+    submissionLock.current = true;
     setIsSubmitting(true);
     setError("");
     const bytes = new TextEncoder().encode(username + ":" + password);
     const authorization = "Basic " + btoa(Array.from(bytes, byte => String.fromCharCode(byte)).join(""));
     try {
+      const token = await getRecaptchaToken("admin_login");
       const response = await fetch((import.meta.env.VITE_API_URL || "http://localhost:5001") + "/api/contact-enquiries/access", {
-        method: "POST", headers: { Authorization: authorization },
+        method: "POST", headers: { Authorization: authorization, "X-Recaptcha-Token": token },
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || "Unable to sign in.");
@@ -25,6 +34,7 @@ export default function AdminLogin({ onLogin }) {
     } catch (error) {
       setError(error.message || "Unable to sign in. Please try again.");
     } finally {
+      submissionLock.current = false;
       setIsSubmitting(false);
     }
   };

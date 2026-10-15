@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import {
   getExampleNumber,
   parsePhoneNumberFromString,
 } from "libphonenumber-js/max";
+import { getRecaptchaToken } from "./recaptcha";
 import examples from "libphonenumber-js/mobile/examples";
 
 // Country phone digit rules: exact number of digits + dial code
@@ -77,7 +78,6 @@ const initialForm = {
   message: "",
   acceptedPrivacy: false,
   file: null,
-  captchaVerified: false,
 };
 
 const NAME_PATTERN = /^[A-Za-z]+(?: [A-Za-z]+)*$/;
@@ -193,10 +193,6 @@ const validateForm = (form) => {
     errors.acceptedPrivacy = "Please accept the privacy policy to continue";
   }
 
-  if (!form.captchaVerified) {
-    errors.captcha = "Please verify that you are not a robot";
-  }
-
   if (form.file) {
     const allowedTypes = [
       "application/pdf",
@@ -227,6 +223,7 @@ const validateForm = (form) => {
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5001";
 
 export const useContactEnquiryForm = () => {
+  const submissionLock = useRef(false);
   const [form, setForm] = useState(initialForm);
   const [errors, setErrors] = useState({});
   const [submitted, setSubmitted] = useState(false);
@@ -338,26 +335,9 @@ export const useContactEnquiryForm = () => {
     }
   };
 
-  const handleCaptchaChange = (verified) => {
-    setForm((previousForm) => ({
-      ...previousForm,
-      captchaVerified: verified,
-    }));
-
-    if (errors.captcha) {
-      setErrors((previousErrors) => ({
-        ...previousErrors,
-        captcha: "",
-      }));
-    }
-
-    if (submitError) {
-      setSubmitError("");
-    }
-  };
-
   const handleSubmit = async (event) => {
     event.preventDefault();
+    if (submissionLock.current) return;
 
     const { errors: validationErrors, formattedPhone } = validateForm(form);
 
@@ -367,6 +347,7 @@ export const useContactEnquiryForm = () => {
     }
 
     try {
+      submissionLock.current = true;
       setSubmitting(true);
       setSubmitError("");
 
@@ -382,9 +363,11 @@ export const useContactEnquiryForm = () => {
         formData.append("file", form.file);
       }
 
+      const token = await getRecaptchaToken("enquiry_submit");
       const response = await fetch(`${API_URL}/api/contact-enquiries`, {
         method: "POST",
         body: formData,
+        headers: { "X-Recaptcha-Token": token },
       });
 
       const data = await response.json();
@@ -404,6 +387,7 @@ export const useContactEnquiryForm = () => {
       console.error("Contact form submission error:", error);
       setSubmitError(error.message || "Unable to submit enquiry.");
     } finally {
+      submissionLock.current = false;
       setSubmitting(false);
     }
   };
@@ -420,7 +404,6 @@ export const useContactEnquiryForm = () => {
     handlePhoneChange,
     handlePrivacyChange,
     handleFileChange,
-    handleCaptchaChange,
     handleSubmit,
   };
 };

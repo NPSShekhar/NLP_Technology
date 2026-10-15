@@ -1,5 +1,5 @@
 export const HOME_ROUTE = "/";
-export const LAUNCH_DURATION_SECONDS = 65; // 2 minutes
+export const LAUNCH_DURATION_SECONDS = 120; // 2 minutes
 
 const STORAGE_KEY = "nlp_launch_target_time";
 

@@ -24,7 +24,7 @@ test("enquiry routes protect personal data and validate/delete only the selected
   };
   const sandbox = { module: { exports: {} }, require: name => dependencies[name], console: { error() {} } };
   vm.runInNewContext(fs.readFileSync(path.join(__dirname, "../controllers/contactController.js"), "utf8"), sandbox);
-  const routeSandbox = { module: { exports: {} }, require: name => name === "../controllers/contactController" ? sandbox.module.exports : name === "../middleware/requireAdmin" ? requireAdmin : require(name) };
+  const routeSandbox = { module: { exports: {} }, require: name => name === "../controllers/contactController" ? sandbox.module.exports : name === "../middleware/requireAdmin" ? requireAdmin : name === "../middleware/verifyRecaptcha" ? () => (req, res, next) => next() : require(name) };
   vm.runInNewContext(fs.readFileSync(path.join(__dirname, "../routes/contactRoutes.js"), "utf8"), routeSandbox);
   const app = express();
   app.use("/enquiries", routeSandbox.module.exports);

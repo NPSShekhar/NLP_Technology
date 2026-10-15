@@ -10,7 +10,6 @@ import {
   ContactPhoneField,
   ContactPrivacyCheckbox,
   ContactFileUploader,
-  ContactInlineCaptcha,
   SuccessPopupModal,
 } from "../components/ContactFormFields";
 import {
@@ -64,7 +63,6 @@ export default function Contactpage() {
     handlePhoneChange,
     handlePrivacyChange,
     handleFileChange,
-    handleCaptchaChange,
     handleSubmit,
   } = useContactEnquiryForm();
 
@@ -290,7 +288,7 @@ export default function Contactpage() {
                     w-full
                     h-[220px]
                     md:h-[300px]
-                    lg:h-[520px]
+                    lg:h-[480px]
                     rounded-[12px]
                     overflow-hidden
                     cursor-pointer
@@ -567,13 +565,6 @@ export default function Contactpage() {
                         </span>
                       )}
                     </div>
-
-                    {/* Inline CAPTCHA */}
-                    <ContactInlineCaptcha
-                      onVerify={handleCaptchaChange}
-                      captchaVerified={form.captchaVerified}
-                      errors={errors}
-                    />
 
                     {/* Privacy policy checkbox */}
                     <ContactPrivacyCheckbox

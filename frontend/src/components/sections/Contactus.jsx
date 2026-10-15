@@ -7,7 +7,6 @@ import {
   ContactPhoneField,
   ContactPrivacyCheckbox,
   ContactFileUploader,
-  ContactInlineCaptcha,
   SuccessPopupModal,
 } from "../ContactFormFields";
 
@@ -79,7 +78,6 @@ const ContactSection = () => {
     handlePhoneChange,
     handlePrivacyChange,
     handleFileChange,
-    handleCaptchaChange,
     handleSubmit,
   } = useContactEnquiryForm();
 
@@ -572,13 +570,6 @@ const ContactSection = () => {
                         </span>
                       )}
                     </div>
-
-                    {/* Inline CAPTCHA */}
-                    <ContactInlineCaptcha
-                      onVerify={handleCaptchaChange}
-                      captchaVerified={form.captchaVerified}
-                      errors={errors}
-                    />
 
                     {/* Privacy Checkbox */}
                     <ContactPrivacyCheckbox
