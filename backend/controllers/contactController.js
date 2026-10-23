@@ -120,7 +120,7 @@ const createContactEnquiry = async (req, res) => {
 Name: ${name}
 Email: ${email}
 Phone: ${phone}
-Address: ${address}
+Company Name: ${address}
 
 Message:
 ${message}
@@ -150,7 +150,7 @@ ${message}
           </p>
 
           <p>
-            <strong>Address:</strong>
+            <strong>Company Name:</strong>
             ${escapeHtml(address)}
           </p>
 

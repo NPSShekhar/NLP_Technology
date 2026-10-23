@@ -119,7 +119,7 @@ export default function EnquiriesManager({ authorization }) {
         ) : <>
           <div className="overflow-x-auto">
             <table className="w-full min-w-[1150px] text-left text-sm">
-              <thead><tr className="border-b border-sky-200 text-slate-500">{["Name", "Company", "Contact", "Date & Time", "Message / Enquiry", "Uploaded Files", "Action"].map(title => <th key={title} scope="col" className="px-2 py-5 text-[16px] font-semibold">{title}</th>)}</tr></thead>
+              <thead><tr className="border-b border-sky-200 text-slate-500">{["Name", "Company Name", "Contact", "Date & Time", "Message / Enquiry", "Uploaded Files", "Action"].map(title => <th key={title} scope="col" className="px-2 py-5 text-[16px] font-semibold">{title}</th>)}</tr></thead>
               <tbody className="[&_td]:align-top [&_td]:leading-6">{visible.map(item => <tr key={item.id} className="border-b border-sky-200 last:border-0">
                 <td className="max-w-[160px] break-words px-3 py-5 font-semibold">{item.name}</td>
                 <td className="max-w-[160px] break-words px-3 py-5">{item.address}</td>
@@ -143,7 +143,7 @@ export default function EnquiriesManager({ authorization }) {
       <dialog ref={dialog} onClose={() => setSelected(null)} aria-labelledby="enquiry-detail-heading" className="m-auto max-h-[85vh] w-[calc(100%-32px)] max-w-2xl overflow-y-auto rounded-[20px] bg-white p-6 text-[#2A2E34] shadow-2xl backdrop:bg-black/50 md:p-8">
         {selected && <>
           <div className="mb-6 flex items-center justify-between gap-4"><h2 id="enquiry-detail-heading" className="text-2xl font-bold">Enquiry details</h2><button autoFocus onClick={() => dialog.current.close()} aria-label="Close enquiry details" className="rounded-lg p-2 hover:bg-slate-100"><X /></button></div>
-          <dl className="grid gap-5 sm:grid-cols-2">{[["Name", selected.name], ["Company", selected.address], ["Email", selected.email], ["Phone", selected.phone], ["Date & Time", dateText(selected.created_at)]].map(([label, value]) => <div key={label}><dt className="text-sm text-slate-500">{label}</dt><dd className="mt-1 break-words font-medium">{value}</dd></div>)}</dl>
+          <dl className="grid gap-5 sm:grid-cols-2">{[["Name", selected.name], ["Company Name", selected.address], ["Email", selected.email], ["Phone", selected.phone], ["Date & Time", dateText(selected.created_at)]].map(([label, value]) => <div key={label}><dt className="text-sm text-slate-500">{label}</dt><dd className="mt-1 break-words font-medium">{value}</dd></div>)}</dl>
           <h3 className="mb-2 mt-6 font-semibold">Uploaded Files</h3>{fileLink(selected)}
           <h3 className="mb-2 mt-6 font-semibold">Message / Enquiry</h3><p className="whitespace-pre-wrap break-words rounded-xl bg-[#EEF6FD] p-4">{selected.message}</p>
         </>}
