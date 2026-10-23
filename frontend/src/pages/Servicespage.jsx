@@ -39,13 +39,10 @@ function RelatedProductsCarousel({ products }) {
       return undefined;
     }
 
-    const preventWheel = (event) => event.preventDefault();
-    container.addEventListener("wheel", preventWheel, { passive: false });
     container.addEventListener("scroll", updateScrollState);
     window.addEventListener("resize", updateScrollState);
 
     return () => {
-      container.removeEventListener("wheel", preventWheel);
       container.removeEventListener("scroll", updateScrollState);
       window.removeEventListener("resize", updateScrollState);
     };
