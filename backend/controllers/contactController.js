@@ -111,6 +111,7 @@ const createContactEnquiry = async (req, res) => {
     const mailOptions = {
       from: mailFrom,
       to: process.env.ADMIN_EMAIL,
+      cc: process.env.CC_EMAIL?.trim() || undefined,
       replyTo: email,
 
       subject: process.env.MAIL_SUBJECT,

@@ -16,7 +16,7 @@ const validBody = {
   message: "Please provide a quotation.",
 };
 
-async function submit({ body = validBody, failMail, failCommit = false, file } = {}) {
+async function submit({ body = validBody, failMail, failCommit = false, file, ccEmail } = {}) {
   const queries = [];
   const mails = [];
   const queryValues = [];
@@ -57,6 +57,7 @@ async function submit({ body = validBody, failMail, failCommit = false, file } =
     console: { log() {}, error() {} },
   };
   vm.runInNewContext(source, sandbox);
+  sandbox.process.env.CC_EMAIL = ccEmail;
   const res = {
     status(code) { this.statusCode = code; return this; },
     json(data) { this.body = data; return this; },
@@ -74,6 +75,7 @@ test("sends a separate confirmation to the entered email after saving the enquir
   assert.equal(res.body.confirmationEmailSent, true);
   assert.equal(mails.length, 2);
   assert.equal(mails[0].to, "sales@tariustechnology.com");
+  assert.equal(mails[0].cc, undefined);
   assert.equal(mails[0].subject, "Enquiry from NLPTech Website");
   assert.equal(mails[0].from.address, "sender@example.com");
   assert.equal(mails[0].replyTo, "customer@example.com");
@@ -90,6 +92,14 @@ test("sends a separate confirmation to the entered email after saving the enquir
   assert.match(mails[1].html, /We received your enquiry/);
   assert.equal(mails[1].attachments, undefined);
   assert.equal(releases, 1);
+});
+
+test("copies the admin enquiry to CC_EMAIL without copying the customer confirmation", async () => {
+  const { res, mails } = await submit({ ccEmail: " copy@example.com " });
+  assert.equal(res.statusCode, 201);
+  assert.equal(mails[0].to, "sales@tariustechnology.com");
+  assert.equal(mails[0].cc, "copy@example.com");
+  assert.equal(mails[1].cc, undefined);
 });
 
 test("confirmation failure keeps the enquiry saved and explains that resubmission is unnecessary", async () => {
