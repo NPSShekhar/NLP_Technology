@@ -1,3 +1,4 @@
+import { API_URL as API_BASE_URL } from "../lib/api.js";
 import React, { useEffect, useRef, useState } from "react";
 import Navbar from "../components/Layout/navbar";
 import Footer from "../components/Layout/Footer";
@@ -197,7 +198,7 @@ export default function Servicespage() {
         setError("");
 
         const apiUrl =
-          import.meta.env.VITE_API_URL || "http://localhost:5001";
+          API_BASE_URL;
 
         const [servicesResponse, relatedProductsResponse] =
           await Promise.all([

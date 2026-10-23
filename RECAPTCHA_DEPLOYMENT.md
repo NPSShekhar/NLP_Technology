@@ -90,3 +90,16 @@ The backend HTTP tests initially hit sandbox localhost restrictions; rerunning w
 - `RECAPTCHA_DEPLOYMENT.md` (new)
 
 The pre-existing user edit to `frontend/src/lib/launch.js` was left untouched.
+
+## October 23 deployment fix
+
+Frontend API requests now default to same-origin `/api/...`. A production build ignores a localhost `VITE_API_URL`; a separate public backend can still be set with an HTTPS `VITE_API_URL` (base origin, without `/api`). The localhost target in `vite.config.js` is only the local development proxy and is not shipped to browsers.
+
+reCAPTCHA now loads at application startup so the standard v3 badge can appear before submission. Tokens are generated only when submitting, and a failed script load can be retried. v3 has no checkbox challenge.
+
+For this deployment:
+1. Set `VITE_RECAPTCHA_SITE_KEY` in `frontend/.env` or the build environment before building. Use a v3 key registered for `nlptec.com` and any other frontend hostname actually used.
+2. Set the matching `RECAPTCHA_SECRET_KEY`, `RECAPTCHA_ALLOWED_HOSTNAMES=nlptec.com,www.nlptec.com`, and `FRONTEND_URL=https://nlptec.com,https://www.nlptec.com` in the backend deployment environment. Never put the secret in frontend variables.
+3. Run `npm run build` from the project root and upload the new `frontend/dist` contents to the existing frontend document root. Restart the backend if its environment changed.
+4. Ensure Plesk routes `/api/*` to this Node backend, not to the SPA index file. Check `/api/services` and `/api/social-links` return JSON on the public domain. The existing backend already mounts these routes; no public port 5001 is needed.
+5. Clear any CDN/browser cache of the old bundle. Check the badge and a real form submission on the public domain. Google key/domain validity and live Plesk routing require deployment verification.

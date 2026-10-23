@@ -1,3 +1,4 @@
+import { API_URL as API_BASE_URL } from "../lib/api.js";
 import { useRef, useState } from "react";
 import { User, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
 import { getRecaptchaToken } from "../lib/recaptcha";
@@ -25,7 +26,7 @@ export default function AdminLogin({ onLogin }) {
     const authorization = "Basic " + btoa(Array.from(bytes, byte => String.fromCharCode(byte)).join(""));
     try {
       const token = await getRecaptchaToken("admin_login");
-      const response = await fetch((import.meta.env.VITE_API_URL || "http://localhost:5001") + "/api/contact-enquiries/access", {
+      const response = await fetch((API_BASE_URL) + "/api/contact-enquiries/access", {
         method: "POST", headers: { Authorization: authorization, "X-Recaptcha-Token": token },
       });
       const data = await response.json();

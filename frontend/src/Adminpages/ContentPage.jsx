@@ -1,3 +1,4 @@
+import { API_URL as API_BASE_URL } from "../lib/api.js";
 import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { ChevronDown, LogOut, Globe, Crop } from "lucide-react";
@@ -16,7 +17,7 @@ import AdminLogin from "./AdminLogin";
 import EnquiriesManager from "./EnquiriesManager";
 
 const API_URL =
-  import.meta.env.VITE_API_URL || "http://localhost:5001";
+  API_BASE_URL;
 
 export default function ContentPage() {
   const [activeTab, setActiveTab] = useState("popup");

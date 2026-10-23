@@ -1,9 +1,10 @@
+import { API_URL as API_BASE_URL } from "../../lib/api.js";
 import React, { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 
 const API_URL =
-  import.meta.env.VITE_API_URL || "http://localhost:5001";
+  API_BASE_URL;
 
 export default function ProductsAndServices() {
   const [services, setServices] = useState([]);

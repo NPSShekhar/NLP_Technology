@@ -1,4 +1,4 @@
-const siteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
+const siteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY?.trim();
 let scriptPromise;
 const failure = () => new Error("Security verification is unavailable. Please try again or reload the page.");
 
@@ -10,11 +10,12 @@ function withTimeout(promise) {
   ]).finally(() => clearTimeout(timer));
 }
 
-function loadRecaptcha() {
+export function loadRecaptcha() {
   if (!siteKey?.trim()) return Promise.reject(failure());
   if (!scriptPromise) {
+    let script;
     scriptPromise = withTimeout(new Promise((resolve, reject) => {
-      const script = document.createElement("script");
+      script = document.createElement("script");
       script.src = `https://www.google.com/recaptcha/api.js?render=${encodeURIComponent(siteKey)}`;
       script.async = true;
       script.onload = () => {
@@ -23,7 +24,11 @@ function loadRecaptcha() {
       };
       script.onerror = () => reject(failure());
       document.head.appendChild(script);
-    }));
+    })).catch(error => {
+      script?.remove();
+      scriptPromise = undefined;
+      throw error;
+    });
   }
   return scriptPromise;
 }

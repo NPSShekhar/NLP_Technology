@@ -1,3 +1,4 @@
+import { API_URL as API_BASE_URL } from "./api.js";
 import { useRef, useState } from "react";
 
 import {
@@ -220,7 +221,7 @@ const validateForm = (form) => {
   };
 };
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5001";
+const API_URL = API_BASE_URL;
 
 export const useContactEnquiryForm = () => {
   const submissionLock = useRef(false);

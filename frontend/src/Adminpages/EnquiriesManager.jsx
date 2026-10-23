@@ -1,8 +1,9 @@
+import { API_URL as API_BASE_URL } from "../lib/api.js";
 import { useEffect, useRef, useState } from "react";
 import DocxPreview from "../components/DocxPreview";
 import { Eye, Trash2, RefreshCw, X, Mail, Search, Download, FileText, ChevronLeft, ChevronRight } from "lucide-react";
 
-const endpoint = `${import.meta.env.VITE_API_URL || "http://localhost:5001"}/api/contact-enquiries`;
+const endpoint = `${API_BASE_URL}/api/contact-enquiries`;
 const dateText = value => value ? new Date(value).toLocaleString() : "—";
 const actionClass = "inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 font-semibold disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2";
 
